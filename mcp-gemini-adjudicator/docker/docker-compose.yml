@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mcp-gemini-adjudicator:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mcp-gemini-adjudicator
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-pro-latest}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ../examples:/app/examples:ro
+      - logs:/app/logs
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Health check')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  logs:
+    driver: local
+
+networks:
+  mcp-network:
+    driver: bridge

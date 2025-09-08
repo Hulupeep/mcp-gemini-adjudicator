@@ -1,0 +1,86 @@
+{
+  "mcpServers": {
+    "gemini-consensus": {
+      "command": "node",
+      "args": [
+        "/path/to/your/gemini_consensus/src/index.js"
+      ],
+      "env": {
+        "GEMINI_API_KEY": "your_gemini_api_key_here",
+        "GEMINI_MODEL": "gemini-1.5-flash",
+        "MAX_CONSENSUS_ROUNDS": "10",
+        "CONSENSUS_THRESHOLD": "0.75",
+        "API_TIMEOUT": "30000",
+        "LOG_LEVEL": "info",
+        "DEBUG_CONSENSUS": "false",
+        "GEMINI_TEMPERATURE": "0.1",
+        "MAX_TOKENS": "1024",
+        "CONSENSUS_PARTICIPANTS": "3"
+      }
+    }
+  },
+  "_comment": {
+    "setup_instructions": [
+      "1. Copy this file to your Claude Desktop configuration directory:",
+      "   - macOS: ~/Library/Application Support/Claude/claude_desktop_config.json",
+      "   - Windows: %APPDATA%\\Claude\\claude_desktop_config.json",
+      "   - Linux: ~/.config/claude/claude_desktop_config.json",
+      "",
+      "2. Update the 'command' path to point to your actual installation:",
+      "   Replace '/path/to/your/gemini_consensus/src/index.js' with the full path",
+      "   to your gemini_consensus project's index.js file",
+      "",
+      "3. Get your Gemini API key:",
+      "   - Visit https://aistudio.google.com/app/apikey",
+      "   - Sign in with your Google account",
+      "   - Create a new API key",
+      "   - Replace 'your_gemini_api_key_here' with your actual API key",
+      "",
+      "4. Customize environment variables as needed:",
+      "   - GEMINI_MODEL: Choose from gemini-1.5-flash, gemini-1.5-pro, gemini-1.0-pro",
+      "   - CONSENSUS_THRESHOLD: Adjust agreement level (0.5-1.0)",
+      "   - LOG_LEVEL: Set to debug for detailed logging",
+      "",
+      "5. Restart Claude Desktop after making changes",
+      "",
+      "6. Test the connection by using the consensus tools in Claude Desktop"
+    ],
+    "example_paths": {
+      "development": "/Users/yourname/projects/gemini_consensus/src/index.js",
+      "global_install": "/usr/local/lib/node_modules/gemini-consensus/src/index.js",
+      "windows_example": "C:\\Users\\YourName\\Projects\\gemini_consensus\\src\\index.js"
+    },
+    "troubleshooting": {
+      "common_issues": [
+        "If Claude can't find the server, check the path in 'command' and 'args'",
+        "If you get API errors, verify your GEMINI_API_KEY is correct",
+        "If consensus fails, try lowering CONSENSUS_THRESHOLD or increasing MAX_CONSENSUS_ROUNDS",
+        "For permission errors, ensure Node.js can execute the index.js file"
+      ],
+      "debug_mode": "Set LOG_LEVEL to 'debug' and DEBUG_CONSENSUS to 'true' for detailed logs"
+    },
+    "alternative_configurations": {
+      "npm_global": {
+        "description": "If installed globally via npm",
+        "command": "gemini-consensus",
+        "args": []
+      },
+      "npx": {
+        "description": "Using npx (requires network connection)",
+        "command": "npx",
+        "args": ["gemini-consensus"]
+      },
+      "development_mode": {
+        "description": "For development with nodemon",
+        "command": "npx",
+        "args": ["nodemon", "/path/to/your/gemini_consensus/src/index.js"]
+      }
+    },
+    "security_notes": [
+      "Never commit your actual API key to version control",
+      "Consider using environment variables or secure key management",
+      "The API key in this config is visible to Claude Desktop",
+      "For production use, consider using a dedicated service account"
+    ]
+  }
+}

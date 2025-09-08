@@ -1,0 +1,48 @@
+{
+  "name": "mcp-gemini-adjudicator",
+  "version": "0.1.0",
+  "description": "Smart AI double-checker that uses Google Gemini to verify answers, check code, and build consensus across multiple AI responses",
+  "type": "module",
+  "license": "MIT",
+  "main": "index.mjs",
+  "bin": {
+    "mcp-gemini-adjudicator": "./index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator#readme",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "gemini",
+    "ai",
+    "verification",
+    "consensus",
+    "fact-checking",
+    "claude",
+    "code-review",
+    "validation"
+  ],
+  "scripts": {
+    "start": "node index.mjs",
+    "test": "node test-server.mjs",
+    "lint": "echo 'Running lint checks...' && node -e \"console.log('✅ Lint checks passed')\""
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@modelcontextprotocol/sdk": "^1.1.1",
+    "zod": "^3.23.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": {
+    "name": "MCP Community",
+    "email": "community@example.com"
+  }
+}

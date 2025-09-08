@@ -1,0 +1,35 @@
+# Prometheus configuration for Gemini Consensus monitoring
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rules files
+rule_files: []
+
+# Scrape configurations
+scrape_configs:
+  # Gemini Consensus application metrics
+  - job_name: 'gemini-consensus'
+    static_configs:
+      - targets: ['gemini-consensus:9090']
+    scrape_interval: 10s
+    metrics_path: '/metrics'
+    
+  # Redis metrics (if using redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    
+  # Node.js process metrics
+  - job_name: 'node-process'
+    static_configs:
+      - targets: ['gemini-consensus:3000']
+    metrics_path: '/metrics/process'
+    scrape_interval: 30s
