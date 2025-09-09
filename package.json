@@ -30,12 +30,16 @@
   ],
   "scripts": {
     "start": "node index.mjs",
+    "monitor": "node monitoring/server.mjs",
+    "dev": "npm run start & npm run monitor",
     "test": "node test-server.mjs",
     "lint": "echo 'Running lint checks...' && node -e \"console.log('✅ Lint checks passed')\""
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@modelcontextprotocol/sdk": "^1.1.1",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
     "zod": "^3.23.8"
   },
   "engines": {

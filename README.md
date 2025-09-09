@@ -111,6 +111,29 @@ This project includes Claude Code hooks that automatically verify every change:
 
 With hooks enabled, every task gets automatically verified for completeness and correctness!
 
+### 📊 Real-Time Monitoring Dashboard (NEW!)
+
+Monitor your AI verification workflow in real-time with the included web dashboard:
+
+```bash
+# Start the monitoring server
+npm run monitor
+
+# Or run both MCP server and monitor together
+npm run dev
+
+# Open browser to http://localhost:4000
+```
+
+The dashboard provides:
+- **Live updates** of all verification attempts
+- **Color-coded status** (PASS ✅, FAIL ❌, SKIPPED ⚠️)
+- **Attempt tracking** showing how many tries each task took
+- **Detailed feedback** from the adjudicator
+- **Trust and transparency** into the AI workflow
+
+See `monitoring/README.md` for full details.
+
 ## ⚡ Installation
 
 ### Prerequisites

@@ -1,0 +1,116 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #00aaff;
+}
+
+.status-indicator {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.status-connected {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-disconnected {
+    background-color: #dc3545;
+    color: white;
+}
+
+.log-entry {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.summary {
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.summary:hover {
+    background-color: #2a2a2a;
+}
+
+.task-id {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+.status {
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-size: 0.8em;
+}
+
+.status-PASS {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-FAIL {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-SKIPPED {
+    background-color: #6c757d;
+    color: white;
+}
+
+.status-INFO {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.details {
+    padding: 15px;
+    background-color: #252525;
+    border-top: 1px solid #333;
+    display: none; /* Hidden by default */
+}
+
+.details.visible {
+    display: block;
+}
+
+.details pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #111;
+    padding: 10px;
+    border-radius: 5px;
+    color: #f0f0f0;
+}
