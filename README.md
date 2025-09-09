@@ -38,24 +38,78 @@
 - **🛡️ Error Handling** - Robust fallback mechanisms
 - **🔄 Hooks Coordination** - Claude-Flow integration support
 
+## The Adjudicator Workflow: Solving AI Unreliability
+
+### Why This is Needed: The Problem of Partial Work
+
+Large Language Models (LLMs) are powerful, but can be unreliable for complex or repetitive tasks. When asked to perform an operation across many items (like updating 100 product descriptions), an LLM might only complete a fraction of the work, get stuck, or "hallucinate" that it's finished. Manually verifying this work is tedious and defeats the purpose of automation.
+
+This project provides a solution by creating a "supervisor" AI to automatically verify the "worker" AI's output.
+
+### What This Solves: Automated, Trustworthy AI Execution
+
+This system introduces an **Adjudicator**—a supervisor AI powered by Gemini—that programmatically checks the work of another AI (like Claude). It doesn't just check for errors; it verifies task *completeness* against a set of rules.
+
+By integrating with a hook-based system (like Claude Flow), you can build a closed-loop, self-correcting workflow where tasks are not considered "done" until they pass a rigorous, automated inspection.
+
+### How It Works: The Core Workflow
+
+The process turns a simple request into a fully verified, multi-agent task:
+
+1.  **Task Interception**: A user issues a high-level command (e.g., "Update all blog posts"). A `UserPromptSubmit` hook intercepts this command *before* the worker AI sees it.
+
+2.  **Test Plan Generation**: The hook sends a "meta-prompt" to an LLM, instructing it to generate two things:
+    *   A step-by-step plan for the worker AI.
+    *   A detailed **`verification_prompt`**—a precise checklist for the Adjudicator AI. This checklist is saved for later.
+
+3.  **Task Execution**: The worker AI (e.g., Claude) receives its instructions and performs the task, such as editing a file.
+
+4.  **Adjudication**: After the worker AI modifies a file, a `PostToolUse` hook is triggered. This hook:
+    *   Retrieves the saved `verification_prompt`.
+    *   Calls the **`verify_with_gemini`** tool (the Adjudicator).
+    *   Provides the worker's output (`artifact`) and the `verification_prompt` as inputs.
+
+5.  **Verdict**: The Adjudicator returns a structured JSON object with a clear `verdict` (`PASS`, `FAIL`, `NEEDS_IMPROVEMENT`) and detailed feedback, pinpointing exactly what is missing or incorrect. A `FAIL` verdict can halt the process or even trigger an automated correction loop.
+
+This workflow transforms LLM-based automation from a "fire-and-forget" hope into a reliable, deterministic, and verifiable process.
+
 ## 🚀 Quick Start
 
 ```bash
 # Clone and install
-git clone <repository-url>
-cd gemini_consensus
+git clone https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator
+cd mcp-gemini-adjudicator
 npm install
 
 # Set up environment
 cp .env.example .env
-# Add your GOOGLE_API_KEY to .env
+# Add your GEMINI_API_KEY to .env (get from https://aistudio.google.com/app/apikey)
 
 # Start the MCP server
 node index.mjs
-
-# Or run with Claude Flow coordination
-npx claude-flow@alpha hooks pre-task --description "Start Gemini Consensus"
 ```
+
+### 🪝 Enable Automatic Verification (Optional but Powerful!)
+
+This project includes Claude Code hooks that automatically verify every change:
+
+```bash
+# Quick setup - add to .claude/settings.json:
+{
+  "hooks": {
+    "UserPromptSubmit": [{
+      "matcher": "*",
+      "hooks": [{"type": "command", "command": ".claude/hooks/generate_verification_prompt.sh"}]
+    }],
+    "PostToolUse": [{
+      "matcher": "WriteFile|Edit|Replace",
+      "hooks": [{"type": "command", "command": ".claude/hooks/run_verification.sh"}]
+    }]
+  }
+}
+```
+
+With hooks enabled, every task gets automatically verified for completeness and correctness!
 
 ## ⚡ Installation
 
@@ -144,6 +198,38 @@ SEARCH_THRESHOLD=0.7
 LOG_LEVEL=info
 DEBUG_MODE=false
 ```
+
+## 🪝 Advanced: Claude Code Hooks Integration
+
+The MCP Gemini Adjudicator includes powerful hook scripts that create an **automated verification loop** directly in Claude Code:
+
+### How It Works
+
+1. **Task Analysis**: When you submit a prompt, the system automatically generates verification criteria
+2. **Execution**: Claude performs the requested task
+3. **Verification**: Every file change is automatically verified against the criteria
+4. **Feedback Loop**: Failed verifications block the operation and provide specific feedback
+
+### Real-World Example
+
+```bash
+User: "Update all product pages with pricing, features, and testimonials sections"
+
+System automatically:
+✅ Generates checklist: Each page must have pricing, features, testimonials
+✅ Monitors file changes
+✅ Verifies completeness
+❌ Blocks if any page is missing required sections
+📝 Provides specific feedback: "Page 3 missing testimonials, Page 7 missing pricing"
+```
+
+### Hook Scripts Included
+
+- **`generate_verification_prompt.sh`**: Creates task-specific verification criteria
+- **`run_verification.sh`**: Verifies changes against criteria
+- **Production versions**: Ready-to-use scripts with full Gemini API integration
+
+See `.claude/hooks/README.md` for complete setup instructions.
 
 ## 📖 Usage Examples
 
