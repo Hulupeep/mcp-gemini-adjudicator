@@ -106,12 +106,32 @@ function calculate(a, b) {
 3. **Monitor Integration**: All attempts visible on dashboard
 4. **Automatic Cleanup**: Success removes verification criteria
 
+## Large File Handling
+
+The advanced hook includes intelligent file content management:
+
+### HTML Files
+- Extracts only the changed content from Edit operations
+- Falls back to first 5KB preview for large HTML files
+- Prevents Gemini API parsing errors with large documents
+
+### Text Files
+- Limits content to 50KB for efficient processing
+- Handles all common text formats (js, py, json, md, etc.)
+- Gracefully handles binary files
+
+### Smart Detection
+- Uses `file` command when available for accurate MIME type detection
+- Falls back to extension-based detection for compatibility
+- Prevents "Unable to parse response" errors
+
 ## Benefits
 
 - 🚀 **100% Task Completion**: No more partial work
 - 🎯 **Quality Enforcement**: Standards are met, not suggested
 - 🔄 **Automatic Correction**: Claude fixes issues without manual intervention
 - 📊 **Full Visibility**: Monitor shows all retry attempts
+- 📁 **Large File Support**: Handles HTML and large files efficiently
 
 ## Migration
 

@@ -55,9 +55,34 @@ fi
 
 verification_prompt=$(cat "$VERIFICATION_PROMPT_FILE")
 
-# Read file content
-if file --mime-type "$file_path" 2>/dev/null | grep -q "text/"; then
-    file_content=$(cat "$file_path" 2>/dev/null || echo "Error reading file")
+# Read file content (limit size for large files)
+# Check if file command exists, otherwise use basic extension check
+if command -v file >/dev/null 2>&1 && file --mime-type "$file_path" 2>/dev/null | grep -q "text/"; then
+    IS_TEXT=true
+elif [[ "$file_path" =~ \.(txt|js|py|sh|json|md|html|htm|css|xml|yaml|yml|conf|cfg|log)$ ]]; then
+    IS_TEXT=true
+else
+    IS_TEXT=false
+fi
+
+if [ "$IS_TEXT" = true ]; then
+    # For HTML files, just extract a relevant snippet around the change
+    if [[ "$file_path" =~ \.(html|htm)$ ]]; then
+        # Try to get context from tool_input
+        new_content=$(echo "$input_json" | jq -r '.tool_input.new_string // ""' 2>/dev/null)
+        if [ ! -z "$new_content" ] && [ "$new_content" != "null" ]; then
+            file_content="[HTML file - showing changed content only]
+$new_content"
+        else
+            # Fallback: Get first 5000 chars
+            file_content=$(head -c 5000 "$file_path" 2>/dev/null || echo "Error reading file")
+            file_content="[Truncated HTML - first 5000 chars]
+$file_content"
+        fi
+    else
+        # For other text files, read normally but limit to 50KB
+        file_content=$(head -c 50000 "$file_path" 2>/dev/null || echo "Error reading file")
+    fi
 else
     file_content="[Binary file]"
 fi
