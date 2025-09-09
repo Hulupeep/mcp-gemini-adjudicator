@@ -19,14 +19,14 @@ Enhanced verification hooks that specifically check for:
 ## How It Works
 
 ### 1. Enhanced Prompt Parsing
-The `generate_verification_prompt_enhanced.sh` hook detects:
+The `generate_verification_prompt.sh` hook (enhanced version) detects:
 - **"All" requirements** - "Update all blog posts"
 - **Specific counts** - "Update 20 blog posts"
 - **Format requirements** - "400+ word stories", "H1 titles"
 - **Consistency needs** - "same format", "each must have"
 
 ### 2. Completeness Verification
-The `run_verification_completeness.sh` hook:
+The `run_verification_advanced.sh` hook (with completeness checking):
 - **Counts actual work done** vs what was requested
 - **Identifies skipped items** specifically
 - **Fails partial completion** even if some work was done
@@ -72,8 +72,16 @@ with cost breakdown"
 
 ## Installation
 
-### Option 1: Use Enhanced Hooks (Recommended)
-Update `.claude/settings.json`:
+The completeness checking is now built into the standard hooks. No separate files needed!
+
+### Automatic Installation
+```bash
+# Run the installation script
+./scripts/install_to_project.sh /path/to/your/project
+```
+
+### Manual Installation
+Your `.claude/settings.json` should point to the standard hooks:
 ```json
 {
   "hooks": {
@@ -82,7 +90,7 @@ Update `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "/path/to/.claude/hooks/generate_verification_prompt_enhanced.sh"
+            "command": "/path/to/.claude/hooks/generate_verification_prompt.sh"
           }
         ]
       }
@@ -93,7 +101,7 @@ Update `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "/path/to/.claude/hooks/run_verification_completeness.sh"
+            "command": "/path/to/.claude/hooks/run_verification_advanced.sh"
           }
         ]
       }
@@ -102,20 +110,7 @@ Update `.claude/settings.json`:
 }
 ```
 
-### Option 2: Install to Project
-```bash
-# Copy enhanced hooks
-cp gemini_consensus/.claude/hooks/generate_verification_prompt_enhanced.sh \
-   your-project/.claude/hooks/
-
-cp gemini_consensus/.claude/hooks/run_verification_completeness.sh \
-   your-project/.claude/hooks/
-
-# Make executable
-chmod +x your-project/.claude/hooks/*.sh
-
-# Update settings.json to use enhanced versions
-```
+The hooks automatically detect and enforce completeness requirements!
 
 ## Detection Patterns
 

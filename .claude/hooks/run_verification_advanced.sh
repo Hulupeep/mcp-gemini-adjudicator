@@ -89,7 +89,8 @@ fi
 
 # --- BUILD GEMINI REQUEST ---
 verification_request=$(cat <<EOF
-You are an AI adjudicator verifying if a task has been completed correctly.
+You are a STRICT AI adjudicator verifying if a task has been COMPLETELY finished.
+Pay special attention to completeness - partial work is NOT acceptable.
 
 VERIFICATION CRITERIA:
 $verification_prompt
@@ -101,19 +102,31 @@ CONTENT TO VERIFY:
 $file_content
 \`\`\`
 
+CRITICAL COMPLETENESS CHECKS:
+1. If "ALL" items were requested, verify EVERY SINGLE ONE was updated
+2. If a specific count was given (e.g., "20 blog posts"), count and verify exact number
+3. If a format was specified, verify ALL items follow it consistently
+4. Partial completion (e.g., doing 3 out of 20) is a FAILURE
+5. Saying "completed" without actually doing the work is a FAILURE
+
 Analyze if ALL criteria have been met. Respond with a JSON verdict:
 {
   "verdict": "PASS" or "FAIL",
   "confidence": 0.0 to 1.0,
+  "completeness_check": {
+    "items_requested": "number or 'all'",
+    "items_completed": "actual count",
+    "items_skipped": ["list of skipped items if any"]
+  },
   "analysis": {
     "criteria_met": ["list of met criteria"],
     "criteria_not_met": ["list of unmet criteria"]
   },
   "recommendations": ["specific fixes needed"],
-  "detailed_feedback": "Clear explanation of what's missing or what passed"
+  "detailed_feedback": "Clear explanation focusing on completeness"
 }
 
-Be strict - ALL criteria must be met for a PASS verdict.
+Be VERY strict - if not ALL work is done, it's a FAIL.
 EOF
 )
 
@@ -151,7 +164,15 @@ confidence=$(echo "$verdict_json" | jq -r '.confidence // 0.5' 2>/dev/null || ec
 feedback=$(echo "$verdict_json" | jq -r '.detailed_feedback // "Unable to parse response"' 2>/dev/null || echo "Unable to parse response")
 recommendations=$(echo "$verdict_json" | jq -r '.recommendations[]' 2>/dev/null | head -5)
 
+# Extract completeness info
+items_requested=$(echo "$verdict_json" | jq -r '.completeness_check.items_requested // "unknown"' 2>/dev/null)
+items_completed=$(echo "$verdict_json" | jq -r '.completeness_check.items_completed // "unknown"' 2>/dev/null)
+items_skipped=$(echo "$verdict_json" | jq -r '.completeness_check.items_skipped[]' 2>/dev/null)
+
 echo "Verdict: $verdict (confidence: $confidence)" >> $LOG_FILE
+if [ "$items_requested" != "unknown" ]; then
+    echo "Completeness: $items_completed / $items_requested" >> $LOG_FILE
+fi
 
 # --- SEND TO MONITOR ---
 json_feedback=$(echo "$feedback" | jq -R -s '.')
@@ -164,7 +185,23 @@ if [ "$verdict" == "FAIL" ]; then
     echo "⚠️ Verification FAILED (Attempt $ATTEMPT_NUM)" >> $LOG_FILE
     
     # Build detailed feedback message
-    feedback_message="Verification failed. The following issues need to be addressed:\n\n"
+    feedback_message="Verification failed. "
+    
+    # Add completeness info if available
+    if [ "$items_requested" != "unknown" ] && [ "$items_completed" != "unknown" ]; then
+        feedback_message+="INCOMPLETE WORK DETECTED!\n\n"
+        feedback_message+="📊 Completeness: $items_completed / $items_requested items done\n"
+        
+        if [ ! -z "$items_skipped" ]; then
+            feedback_message+="⚠️ Items skipped:\n"
+            while IFS= read -r item; do
+                feedback_message+="  • $item\n"
+            done <<< "$items_skipped"
+        fi
+        feedback_message+="\n"
+    fi
+    
+    feedback_message+="Issues to address:\n\n"
     feedback_message+="$feedback\n\n"
     
     if [ ! -z "$recommendations" ]; then
