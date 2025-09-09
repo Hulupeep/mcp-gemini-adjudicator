@@ -77,7 +77,7 @@ This workflow transforms LLM-based automation from a "fire-and-forget" hope into
 
 ```bash
 # Clone and install
-git clone https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator
+git clone https://github.com/Hulupeep/mcp-gemini-adjudicator
 cd mcp-gemini-adjudicator
 npm install
 

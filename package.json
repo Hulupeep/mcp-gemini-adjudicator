@@ -10,12 +10,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator.git"
+    "url": "https://github.com/Hulupeep/mcp-gemini-adjudicator.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator/issues"
+    "url": "https://github.com/Hulupeep/mcp-gemini-adjudicator/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/mcp-gemini-adjudicator#readme",
+  "homepage": "https://github.com/Hulupeep/mcp-gemini-adjudicator#readme",
   "keywords": [
     "mcp",
     "model-context-protocol",
