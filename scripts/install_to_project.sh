@@ -48,6 +48,14 @@ cp "$SOURCE_DIR/.claude/hooks/test_gemini_api.sh" .claude/hooks/
 # Keep the direct version as backup
 cp "$SOURCE_DIR/.claude/hooks/run_verification_direct.sh" .claude/hooks/
 
+# Copy logging versions if they exist
+if [ -f "$SOURCE_DIR/.claude/hooks/generate_verification_prompt_with_logging.sh" ]; then
+    cp "$SOURCE_DIR/.claude/hooks/generate_verification_prompt_with_logging.sh" .claude/hooks/
+    cp "$SOURCE_DIR/.claude/hooks/run_verification_with_logging.sh" .claude/hooks/
+    cp "$SOURCE_DIR/.claude/hooks/view_logs.sh" .claude/hooks/
+    echo -e "${GREEN}✅ Installed logging hooks (disabled by default)${NC}"
+fi
+
 # Make them executable
 chmod +x .claude/hooks/*.sh
 
