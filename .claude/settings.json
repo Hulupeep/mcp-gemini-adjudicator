@@ -38,6 +38,17 @@
     ]
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/xanacan/Dropbox/code/gemini_consensus/.claude/hooks/generate_verification_prompt.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -59,6 +70,15 @@
       }
     ],
     "PostToolUse": [
+      {
+        "matcher": "WriteFile|Edit|Replace|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/xanacan/Dropbox/code/gemini_consensus/.claude/hooks/run_verification_direct.sh"
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [
