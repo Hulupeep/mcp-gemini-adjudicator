@@ -1,6 +1,6 @@
 # 🤖 Gemini Consensus - AI-Powered Verification & Consensus System
 
-> **Advanced MCP server providing intelligent verification and consensus analysis using Google Gemini AI for distributed decision-making and validation workflows**
+> **A self-correcting AI workflow system. Use a Gemini-powered Adjudicator to programmatically verify and supervise your primary AI's work, ensuring reliability and task completion.**
 
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
@@ -75,64 +75,49 @@ This workflow transforms LLM-based automation from a "fire-and-forget" hope into
 
 ## 🚀 Quick Start
 
+This guide starts the core Adjudicator MCP server.
+
 ```bash
-# Clone and install
-git clone https://github.com/Hulupeep/mcp-gemini-adjudicator
-cd mcp-gemini-adjudicator
+# 1. Clone the repository
+git clone https://github.com/your-username/gemini_consensus.git
+cd gemini_consensus
+
+# 2. Install dependencies
 npm install
 
-# Set up environment
+# 3. Set up your environment
 cp .env.example .env
-# Add your GEMINI_API_KEY to .env (get from https://aistudio.google.com/app/apikey)
+# Add your GEMINI_API_KEY to .env
 
-# Start the MCP server
+# 4. Start the core MCP server
 node index.mjs
 ```
 
-### 🪝 Enable Automatic Verification (Optional but Powerful!)
+Your Adjudicator server is now running. The next step is to enable the verification workflow in your other projects.
 
-This project includes Claude Code hooks that automatically verify every change:
+## Integrating with Your Projects
 
-```bash
-# Quick setup - add to .claude/settings.json:
-{
-  "hooks": {
-    "UserPromptSubmit": [{
-      "matcher": "*",
-      "hooks": [{"type": "command", "command": ".claude/hooks/generate_verification_prompt.sh"}]
-    }],
-    "PostToolUse": [{
-      "matcher": "WriteFile|Edit|Replace",
-      "hooks": [{"type": "command", "command": ".claude/hooks/run_verification.sh"}]
-    }]
-  }
-}
-```
+To enable the automated adjudication workflow in a project, you need to install the hook scripts into it.
 
-With hooks enabled, every task gets automatically verified for completeness and correctness!
+For any project you want to supervise:
 
-### 📊 Real-Time Monitoring Dashboard (NEW!)
+1.  **Copy the Tools**: Copy the `setup_hooks.sh` script and the entire `.claude` directory from this repository into the root of your target project.
 
-Monitor your AI verification workflow in real-time with the included web dashboard:
+2.  **Run the Setup Script**: From the root of your target project, run the setup script.
+    ```bash
+    bash setup_hooks.sh
+    ```
+    This will safely configure your project's `.claude/settings.json` to use the verification hooks.
 
-```bash
-# Start the monitoring server
-npm run monitor
+3.  **Restart Your Environment**: Restart your Claude Code session in that project to ensure the hooks are active.
 
-# Or run both MCP server and monitor together
-npm run dev
+Now, any work done by the AI in that project will be automatically verified by your central Adjudicator server.
 
-# Open browser to http://localhost:4000
-```
+## 📊 Global Real-Time Monitoring
 
-The dashboard provides:
-- **Live updates** of all verification attempts
-- **Color-coded status** (PASS ✅, FAIL ❌, SKIPPED ⚠️)
-- **Attempt tracking** showing how many tries each task took
-- **Detailed feedback** from the adjudicator
-- **Trust and transparency** into the AI workflow
+This repository also includes a global, real-time dashboard to monitor all your supervised projects from one place.
 
-See `monitoring/README.md` for full details.
+It should be run as a persistent background service. See the `monitoring/README.md` for full details and setup instructions.
 
 ## ⚡ Installation
 

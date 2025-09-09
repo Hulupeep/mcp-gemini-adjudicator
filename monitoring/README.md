@@ -42,19 +42,35 @@ This architecture ensures that the monitoring is decoupled from the main workflo
 -   **Frontend**: Vanilla HTML5, CSS3, and JavaScript. No frameworks were used, to keep it simple and lightweight.
 -   **Data Flow**: The hook scripts use `curl` to send JSON payloads to the server.
 
-## How to Run It
+## Running the Global Monitor
 
-1.  **Install Dependencies** (if you haven't already):
+This monitor is designed to be a standalone, global tool that you run once in the background. It will then be available to display verification results from any of your supervised projects.
+
+### Recommended Setup
+
+1.  **Move to a Central Location**: For a true global tool, move this `monitoring` directory out of the project folder and into a central location, for example, your home directory or a `.config` folder.
     ```bash
+    # Example: Move to your home directory
+    mv monitoring ~/gemini-adjudicator-monitor
+    ```
+
+2.  **Install Dependencies** (if you haven't already):
+    ```bash
+    # Navigate to the new directory
+    cd ~/gemini-adjudicator-monitor
     npm install express socket.io
     ```
 
-2.  **Start the Server**:
+3.  **Start as a Background Service**:
     ```bash
-    node monitoring/server.mjs
+    # Start the server and send it to the background
+    node server.mjs &
     ```
+    The server is now running persistently. You do not need to start it again unless you restart your computer.
 
-3.  **Open the Monitor**:
-    Navigate to **[http://localhost:4000](http://localhost:4000)** in your web browser.
+4.  **Open the Monitor**:
+    Navigate to **[http://localhost:4000](http://localhost:4000)** in your web browser. Bookmark it!
 
-The page will connect to the server and await updates from your AI workflow.
+### Hook Configuration Note
+
+The `run_verification.sh` hook script is pre-configured to send results to `http://localhost:4000/log`. As long as you run the monitor on the default port, no changes are needed in the hook scripts.
