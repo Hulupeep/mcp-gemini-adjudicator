@@ -811,6 +811,6 @@ SOFTWARE.
 
 ---
 
-**Built with ❤️ by the Gemini Consensus team**
+**Built with ❤️ by Hulupeep and  the Gemini Consensus team**
 
 *Empowering intelligent decision-making through AI-powered verification and consensus analysis*
