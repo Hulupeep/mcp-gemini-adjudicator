@@ -241,6 +241,52 @@ System automatically:
 
 See `.claude/hooks/README.md` for complete setup instructions.
 
+## 📊 Verification Logging & Debugging
+
+### Enable Detailed Logging
+
+Add to your `.env` file:
+```bash
+# Enable comprehensive verification logging
+ENABLE_VERIFICATION_LOGGING=true
+```
+
+### View Logs
+
+```bash
+# View all recent logs (prompts, parsing, Gemini calls)
+./.claude/hooks/view_logs.sh
+
+# View only Gemini API interactions
+./.claude/hooks/view_logs.sh -t gemini
+
+# View last 20 prompts
+./.claude/hooks/view_logs.sh -t prompts -n 20
+
+# View parsing results
+./.claude/hooks/view_logs.sh -t parsing
+```
+
+### What Gets Logged
+
+When enabled, the system tracks:
+- **User prompts** - Last 20 prompts with timestamps
+- **Parsing results** - How prompts are analyzed for verification
+- **Gemini API calls** - All requests and responses
+- **Verification results** - Pass/fail with completeness metrics
+- **Skipped items** - Specific items not completed
+
+### Log Files
+
+- `prompt_history.json` - User prompt history
+- `parsing_log.json` - Prompt parsing results  
+- `gemini_log.json` - API interactions
+- `logs/` - Request/response file backups
+
+**Note**: Logging is disabled by default for performance. Only enable when debugging.
+
+See [docs/LOGGING.md](docs/LOGGING.md) for detailed logging documentation.
+
 ## 📖 Usage Examples
 
 ### 🔍 Code Verification
