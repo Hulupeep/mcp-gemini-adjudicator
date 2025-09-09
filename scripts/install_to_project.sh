@@ -43,8 +43,10 @@ mkdir -p scripts
 # Step 3: Copy all hook scripts
 echo "Installing hook scripts..."
 cp "$SOURCE_DIR/.claude/hooks/generate_verification_prompt.sh" .claude/hooks/
-cp "$SOURCE_DIR/.claude/hooks/run_verification_direct.sh" .claude/hooks/
+cp "$SOURCE_DIR/.claude/hooks/run_verification_advanced.sh" .claude/hooks/
 cp "$SOURCE_DIR/.claude/hooks/test_gemini_api.sh" .claude/hooks/
+# Keep the direct version as backup
+cp "$SOURCE_DIR/.claude/hooks/run_verification_direct.sh" .claude/hooks/
 
 # Make them executable
 chmod +x .claude/hooks/*.sh
@@ -107,7 +109,7 @@ if [ ! -f ".claude/settings.json" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "$PROJECT_DIR/.claude/hooks/run_verification_direct.sh"
+            "command": "$PROJECT_DIR/.claude/hooks/run_verification_advanced.sh"
           }
         ]
       }

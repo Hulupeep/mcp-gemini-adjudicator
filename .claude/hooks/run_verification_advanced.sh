@@ -1,29 +1,28 @@
 #!/bin/bash
-# .claude/hooks/run_verification_direct.sh
-# Direct Gemini API integration - bypasses MCP for automatic verification
+# Advanced verification hook with JSON output for better Claude integration
+# This version uses JSON output to control Claude's behavior more precisely
 
 set -e
 
 # --- CONFIGURATION ---
-HOOK_DIR="/home/xanacan/Dropbox/code/gemini_consensus/.claude/hooks"
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$HOOK_DIR/../.." && pwd)"
 VERIFICATION_PROMPT_FILE="$HOOK_DIR/last_verification_prompt.txt"
 LOG_FILE="$HOOK_DIR/hooks.log"
 MONITOR_URL="http://localhost:4000/log"
-ENV_FILE="/home/xanacan/Dropbox/code/gemini_consensus/.env"
+ENV_FILE="$PROJECT_DIR/.env"
 
 # Load environment variables
 if [ -f "$ENV_FILE" ]; then
     export $(grep -E "^GEMINI_API_KEY=" "$ENV_FILE" | xargs)
-    export $(grep -E "^GEMINI_MODEL=" "$ENV_FILE" | xargs)
 fi
 
-# Fallback to defaults
-GEMINI_MODEL=${GEMINI_MODEL:-"gemini-2.5-flash-lite"}
+GEMINI_MODEL="gemini-2.5-flash-lite"
 GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent"
 
 # --- LOGGING ---
 echo "---" >> $LOG_FILE
-echo "[$(date)] PostToolUse: Running direct Gemini verification" >> $LOG_FILE
+echo "[$(date)] PostToolUse: Running advanced verification" >> $LOG_FILE
 
 # --- READ INPUT ---
 input_json=$(cat)
@@ -31,43 +30,36 @@ echo "Received input: $input_json" >> $LOG_FILE
 file_path=$(echo "$input_json" | jq -r '.tool_input.file_path // .tool_input.files[0] // .tool_input.path')
 
 if [ -z "$file_path" ] || [ "$file_path" == "null" ]; then
-    echo "No file path found. Skipping verification." >> $LOG_FILE
+    echo "No file path found. Skipping." >> $LOG_FILE
     exit 0
 fi
 
-# --- TASK & ATTEMPT TRACKING ---
+# --- TASK TRACKING ---
 TASK_ID=$(basename "$file_path")
 ATTEMPT_FILE="$HOOK_DIR/attempt_counts/${TASK_ID}.txt"
 mkdir -p "$HOOK_DIR/attempt_counts"
-touch "$ATTEMPT_FILE"
 ATTEMPT_NUM=$(($(cat "$ATTEMPT_FILE" 2>/dev/null || echo 0) + 1))
 echo $ATTEMPT_NUM > "$ATTEMPT_FILE"
 
-# --- CHECK FOR API KEY ---
+# --- CHECK API KEY ---
 if [ -z "$GEMINI_API_KEY" ] || [ "$GEMINI_API_KEY" == "your_gemini_api_key_here" ]; then
-    echo "GEMINI_API_KEY not configured. Skipping verification." >> $LOG_FILE
-    curl -s -X POST -H "Content-Type: application/json" \
-         -d "{\"taskId\": \"$TASK_ID\", \"attempt\": $ATTEMPT_NUM, \"status\": \"SKIPPED\", \"feedback\": \"Gemini API key not configured\", \"worker\": \"Claude\", \"adjudicator\": \"N/A\"}" \
-         $MONITOR_URL > /dev/null 2>&1 || true
+    echo "API key not configured. Skipping." >> $LOG_FILE
     exit 0
 fi
 
-# --- READ VERIFICATION DATA ---
+# --- READ VERIFICATION CRITERIA ---
 if [ ! -f "$VERIFICATION_PROMPT_FILE" ]; then
     echo "No verification criteria. Skipping." >> $LOG_FILE
-    curl -s -X POST -H "Content-Type: application/json" \
-         -d "{\"taskId\": \"$TASK_ID\", \"attempt\": $ATTEMPT_NUM, \"status\": \"SKIPPED\", \"feedback\": \"No verification criteria available\", \"worker\": \"Claude\", \"adjudicator\": \"N/A\"}" \
-         $MONITOR_URL > /dev/null 2>&1 || true
     exit 0
 fi
 
 verification_prompt=$(cat "$VERIFICATION_PROMPT_FILE")
 
-# Read file content (handle binary files gracefully)
-if file --mime-type "$file_path" | grep -q "text/"; then
-    artifact_content=$(cat "$file_path" 2>/dev/null || echo "Error reading file")
+# Read file content
+if file --mime-type "$file_path" 2>/dev/null | grep -q "text/"; then
+    file_content=$(cat "$file_path" 2>/dev/null || echo "Error reading file")
 else
-    artifact_content="[Binary file - content not shown]"
+    file_content="[Binary file]"
 fi
 
 # --- BUILD GEMINI REQUEST ---
@@ -81,7 +73,7 @@ FILE BEING VERIFIED: $file_path
 
 CONTENT TO VERIFY:
 \`\`\`
-$artifact_content
+$file_content
 \`\`\`
 
 Analyze if ALL criteria have been met. Respond with a JSON verdict:
@@ -100,11 +92,11 @@ Be strict - ALL criteria must be met for a PASS verdict.
 EOF
 )
 
-# Escape the content for JSON
+# Escape for JSON
 json_content=$(echo "$verification_request" | jq -R -s '.')
 
-# --- CALL GEMINI API DIRECTLY ---
-echo "Calling Gemini API for verification..." >> $LOG_FILE
+# --- CALL GEMINI API ---
+echo "Calling Gemini API..." >> $LOG_FILE
 
 response=$(curl -s -X POST \
     -H "Content-Type: application/json" \
@@ -116,31 +108,25 @@ response=$(curl -s -X POST \
       }],
       \"generationConfig\": {
         \"temperature\": 0.1,
-        \"maxOutputTokens\": 1024,
-        \"responseMimeType\": \"application/json\"
+        \"maxOutputTokens\": 1024
       }
     }" \
     "$GEMINI_API_URL?key=$GEMINI_API_KEY" 2>/dev/null)
 
 # --- PARSE RESPONSE ---
 if [ -z "$response" ]; then
-    echo "Empty response from Gemini API" >> $LOG_FILE
-    curl -s -X POST -H "Content-Type: application/json" \
-         -d "{\"taskId\": \"$TASK_ID\", \"attempt\": $ATTEMPT_NUM, \"status\": \"ERROR\", \"feedback\": \"Failed to get response from Gemini\", \"worker\": \"Claude\", \"adjudicator\": \"Gemini\"}" \
-         $MONITOR_URL > /dev/null 2>&1 || true
+    echo "Empty response from Gemini" >> $LOG_FILE
     exit 0
 fi
 
-# Extract the JSON verdict from Gemini's response
+# Extract verdict
 verdict_json=$(echo "$response" | jq -r '.candidates[0].content.parts[0].text' 2>/dev/null || echo "{}")
-
-# Parse verdict components
 verdict=$(echo "$verdict_json" | jq -r '.verdict // "FAIL"' 2>/dev/null || echo "FAIL")
 confidence=$(echo "$verdict_json" | jq -r '.confidence // 0.5' 2>/dev/null || echo "0.5")
 feedback=$(echo "$verdict_json" | jq -r '.detailed_feedback // "Unable to parse response"' 2>/dev/null || echo "Unable to parse response")
+recommendations=$(echo "$verdict_json" | jq -r '.recommendations[]' 2>/dev/null | head -5)
 
-echo "Gemini verdict: $verdict (confidence: $confidence)" >> $LOG_FILE
-echo "Feedback: $feedback" >> $LOG_FILE
+echo "Verdict: $verdict (confidence: $confidence)" >> $LOG_FILE
 
 # --- SEND TO MONITOR ---
 json_feedback=$(echo "$feedback" | jq -R -s '.')
@@ -148,21 +134,52 @@ curl -s -X POST -H "Content-Type: application/json" \
      -d "{\"taskId\": \"$TASK_ID\", \"attempt\": $ATTEMPT_NUM, \"status\": \"$verdict\", \"feedback\": $json_feedback, \"confidence\": $confidence, \"worker\": \"Claude\", \"adjudicator\": \"Gemini\"}" \
      $MONITOR_URL > /dev/null 2>&1 || true
 
-# --- PROVIDE FEEDBACK TO CLAUDE ---
+# --- PROVIDE STRUCTURED FEEDBACK TO CLAUDE ---
 if [ "$verdict" == "FAIL" ]; then
-    echo "⚠️ Verification FAILED. Gemini says: $feedback" >> $LOG_FILE
-    # Return feedback to Claude so it knows what to fix
-    echo "⚠️ Automatic verification detected issues:" >&2
-    echo "$feedback" >&2
-    echo "" >&2
-    echo "Please address these issues and try again." >&2
-    # Exit with code 2 to block and force Claude to retry
-    exit 2
+    echo "⚠️ Verification FAILED (Attempt $ATTEMPT_NUM)" >> $LOG_FILE
+    
+    # Build detailed feedback message
+    feedback_message="Verification failed. The following issues need to be addressed:\n\n"
+    feedback_message+="$feedback\n\n"
+    
+    if [ ! -z "$recommendations" ]; then
+        feedback_message+="Specific fixes required:\n"
+        while IFS= read -r rec; do
+            feedback_message+="• $rec\n"
+        done <<< "$recommendations"
+    fi
+    
+    # Return JSON output for PostToolUse hook
+    cat <<JSON
+{
+  "decision": "block",
+  "reason": "$feedback_message",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "Attempt $ATTEMPT_NUM failed verification. Please fix the issues and the file will be automatically re-verified."
+  }
+}
+JSON
+    
+    # Exit 0 because we're using JSON output
+    exit 0
 else
-    echo "✅ Verification PASSED!" >> $LOG_FILE
+    echo "✅ Verification PASSED after $ATTEMPT_NUM attempt(s)!" >> $LOG_FILE
+    
     # Clean up on success
     rm -f "$VERIFICATION_PROMPT_FILE"
     rm -f "$ATTEMPT_FILE"
-    echo "✅ Verification passed! All criteria met."
+    
+    # Return success JSON
+    cat <<JSON
+{
+  "decision": undefined,
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "✅ Verification passed! All criteria met after $ATTEMPT_NUM attempt(s)."
+  }
+}
+JSON
+    
     exit 0
 fi
