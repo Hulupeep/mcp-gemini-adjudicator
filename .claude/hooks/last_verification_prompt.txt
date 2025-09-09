@@ -1,0 +1,20 @@
+Task: Update all 20 blog posts to have H1 titles instead of H3, add 400+ word stories, and ensure each has the correct format with cost breakdown
+
+VERIFICATION CRITERIA:
+
+QUANTITY REQUIREMENTS:
+ALL items must be updated/modified\nSpecifically: ALL 20 blog posts must be updated\nNumeric requirements found:\n20 blog posts\n
+FORMAT REQUIREMENTS:
+Specific format/structure must be followed\n- Heading requirements (H1/H2/H3) specified\n- Word count requirement: 400+ word\n
+CREATION VERIFICATION:
+- All specified files/components must be created
+- Implementation must be complete (not partial)
+- All requirements must be met, not just some
+- If quantity specified, ALL items must be created
+
+COMPLETENESS CHECK:
+- If 'all' items requested: Verify EVERY item is updated
+- If specific count given: Verify exact count is completed
+- If pattern/format specified: Verify ALL items follow it
+- Partial completion is NOT acceptable
+- Saying 'completed' without doing all work is a FAILURE
