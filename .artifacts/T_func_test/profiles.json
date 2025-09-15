@@ -1,0 +1,6 @@
+{
+  "code_update_default": {
+    "function_certainty_required": "fuzzy",
+    "reject_unclaimed_changes": true
+  }
+}

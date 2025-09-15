@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/user.schema.json",
+  "title": "User",
+  "description": "A user object from the API",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "The unique identifier for a user"
+    },
+    "name": {
+      "type": "string",
+      "description": "The user's full name"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "The user's email address"
+    },
+    "username": {
+      "type": "string",
+      "description": "The user's username"
+    },
+    "phone": {
+      "type": "string",
+      "description": "The user's phone number"
+    },
+    "website": {
+      "type": "string",
+      "format": "uri",
+      "description": "The user's website"
+    },
+    "company": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "catchPhrase": {
+          "type": "string"
+        },
+        "bs": {
+          "type": "string"
+        }
+      },
+      "required": ["name"]
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "suite": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "zipcode": {
+          "type": "string"
+        },
+        "geo": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "string"
+            },
+            "lng": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": ["city"]
+    }
+  },
+  "required": ["id", "name", "email", "username"]
+}

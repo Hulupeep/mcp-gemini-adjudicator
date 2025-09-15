@@ -147,6 +147,21 @@ if (profile.lint_clean && lintArtifact.errors > 0) {
 }
 ```
 
+## Template Package Available
+
+Use `packages/adapter-template` as a starting point for new adapters:
+
+```bash
+# Copy template
+cp -r packages/adapter-template packages/adapter-yourname
+
+# Update manifest and implement capabilities
+cd packages/adapter-yourname
+vim manifest.json
+```
+
+See the [template README](../packages/adapter-template/README.md) for detailed instructions.
+
 ## Writing a new adapter
 
 ### 1. Create manifest

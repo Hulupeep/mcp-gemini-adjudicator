@@ -1,0 +1,15 @@
+{
+  "schema": "api.schema_result/v1.0",
+  "timestamp": "2025-09-15T22:23:45.899Z",
+  "task_id": "unknown",
+  "ok": false,
+  "errors": [
+    "/website: must match format \"uri\"",
+    "  Details: {\"format\":\"uri\"}"
+  ],
+  "warnings": [],
+  "schema_id": "https://example.com/user.schema.json",
+  "endpoint": "https://jsonplaceholder.typicode.com/users/1",
+  "response_time_ms": 217,
+  "status_code": 200
+}

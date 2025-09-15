@@ -1,0 +1,31 @@
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "test",
+  "task_id": "T_test_fixture",
+  "timestamp": "2024-01-15T10:00:00Z",
+  "claim": {
+    "type": "template",
+    "units_total": 5,
+    "units_list": [
+      "src/app.js",
+      "src/utils.ts",
+      "tests/app.test.js",
+      "docs/README.md",
+      "config/settings.json"
+    ],
+    "scope": {
+      "repo_root": "/test/repo",
+      "targets": ["src", "tests"],
+      "files": [
+        "src/app.js",
+        "src/utils.ts",
+        "tests/app.test.js"
+      ]
+    },
+    "declared": {
+      "intent": "Test template adapter functionality",
+      "approach": "Process all units through template capabilities",
+      "completion_status": "complete"
+    }
+  }
+}

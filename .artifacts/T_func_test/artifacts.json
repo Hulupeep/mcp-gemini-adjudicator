@@ -1,0 +1,20 @@
+{
+  "task_id": "T_func_test",
+  "timestamp": "2024-01-15T14:10:00Z",
+  "artifacts": [
+    {
+      "type": "code:diff",
+      "path": "diff.json",
+      "files_modified": 2,
+      "lines_added": 42,
+      "lines_removed": 2
+    },
+    {
+      "type": "code:map-functions",
+      "path": "function_map.json",
+      "matched_certain": 4,
+      "matched_fuzzy": 1,
+      "unmatched_claims": 0
+    }
+  ]
+}

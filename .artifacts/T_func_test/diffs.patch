@@ -1,0 +1,74 @@
+diff --git a/auth.js b/auth.js
+index 0000000..1234567 100644
+--- a/auth.js
++++ b/auth.js
+@@ -10,6 +10,24 @@ const jwt = require('jsonwebtoken');
+ const config = require('./config');
+
++// Authenticate user with credentials
++async function authenticate(username, password) {
++    // Check user credentials against database
++    const user = await db.findUser(username);
++    if (!user) {
++        throw new Error('User not found');
++    }
++
++    const valid = await bcrypt.compare(password, user.passwordHash);
++    if (!valid) {
++        throw new Error('Invalid password');
++    }
++
++    // Generate JWT token
++    const token = jwt.sign({ userId: user.id }, config.secret);
++    return { token, user: { id: user.id, username: user.username } };
++}
++
++// Validate JWT token
++function validateToken(token) {
++    try {
++        const decoded = jwt.verify(token, config.secret);
++        return { valid: true, userId: decoded.userId };
++    } catch (err) {
++        return { valid: false, error: err.message };
++    }
++}
++
++// Note: refreshToken function was not actually implemented
++// This is a comment about it, but no actual function
++
+ module.exports = {
+-    // existing exports
++    authenticate,
++    validateToken
+ };
+diff --git a/api.js b/api.js
+index 0000000..2345678 100644
+--- a/api.js
++++ b/api.js
+@@ -5,10 +5,28 @@ const auth = require('./auth');
+
+ const router = express.Router();
+
++// Login endpoint
++router.post('/api/login', async (req, res) => {
++    try {
++        const { username, password } = req.body;
++        const result = await auth.authenticate(username, password);
++        res.json(result);
++    } catch (error) {
++        res.status(401).json({ error: error.message });
++    }
++});
++
++// Logout endpoint
++router.post('/api/logout', (req, res) => {
++    // Clear token from client
++    res.json({ message: 'Logged out successfully' });
++});
++
++// Additional helper function not claimed
++function logActivity(action, userId) {
++    console.log(`[${new Date().toISOString()}] ${action} by user ${userId}`);
++}
++
+ module.exports = router;

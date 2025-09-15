@@ -1,0 +1,46 @@
+{
+  "schema": "adapter.manifest/v1.0",
+  "name": "adapter-template",
+  "version": "1.0.0",
+  "description": "Template adapter for creating new verification adapters",
+  "author": "Your Name",
+  "license": "MIT",
+  "entry": "bin/adapter-template",
+  "capabilities": [
+    "template:scan",
+    "template:validate",
+    "template:analyze"
+  ],
+  "requires": {
+    "node": ">=18.0.0",
+    "tools": ["node", "jq"],
+    "network": false
+  },
+  "sandbox": {
+    "tools": ["node", "jq"],
+    "timeout_ms": 30000,
+    "memory_mb": 512,
+    "network": false,
+    "filesystem": "readonly"
+  },
+  "deterministic": true,
+  "outputs": {
+    "template:scan": {
+      "file": "template/scan.json",
+      "schema": "template.scan/v1.0"
+    },
+    "template:validate": {
+      "file": "template/validate.json",
+      "schema": "template.validate/v1.0"
+    },
+    "template:analyze": {
+      "file": "template/analyze.json",
+      "schema": "template.analyze/v1.0"
+    }
+  },
+  "metadata": {
+    "homepage": "https://github.com/YOUR_ORG/adapter-template",
+    "repository": "https://github.com/YOUR_ORG/adapter-template.git",
+    "documentation": "https://github.com/YOUR_ORG/adapter-template/blob/main/README.md"
+  }
+}

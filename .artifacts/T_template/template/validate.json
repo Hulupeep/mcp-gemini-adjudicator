@@ -1,0 +1,42 @@
+{
+  "schema": "template.validate/v1.0",
+  "timestamp": "2025-09-15T20:58:18.299Z",
+  "task_id": "T_test_fixture",
+  "valid": true,
+  "checks": [
+    {
+      "name": "claim_schema",
+      "description": "Claim follows v1.1 schema",
+      "passed": true,
+      "message": null
+    },
+    {
+      "name": "units_present",
+      "description": "Claim has units list",
+      "passed": true,
+      "message": null
+    },
+    {
+      "name": "units_match_total",
+      "description": "Units list matches declared total",
+      "passed": true,
+      "message": null
+    },
+    {
+      "name": "task_id_consistent",
+      "description": "Task ID is consistent",
+      "passed": true,
+      "message": null
+    },
+    {
+      "name": "no_forbidden_fields",
+      "description": "No measured facts in claim",
+      "passed": true,
+      "message": null
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "No verification profile provided"
+  ]
+}

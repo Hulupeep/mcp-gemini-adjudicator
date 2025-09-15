@@ -1,0 +1,235 @@
+#!/usr/bin/env node
+
+/**
+ * Template Adapter CLI
+ *
+ * This is a template for creating new verification adapters.
+ * It demonstrates the standard CLI contract and artifact generation.
+ *
+ * Usage:
+ *   adapter-template <capability> [options]
+ *
+ * Capabilities:
+ *   template:scan     - Scan and analyze input
+ *   template:validate - Validate configuration
+ *   template:analyze  - Perform detailed analysis
+ *
+ * Options:
+ *   --task-dir <path>      Directory for artifacts (required)
+ *   --commitment <file>    Path to commitment.json
+ *   --claim <file>         Path to claim.json
+ *   --profile <file>       Path to verification profile
+ *   --verbose              Enable verbose output
+ *   --help                 Show this help message
+ */
+
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { promises as fs } from 'fs';
+import { scan } from '../src/scan.mjs';
+import { validate } from '../src/validate.mjs';
+import { analyze } from '../src/analyze.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Parse command line arguments
+function parseArgs(args) {
+    const options = {
+        taskDir: null,
+        commitmentPath: null,
+        claimPath: null,
+        profilePath: null,
+        verbose: false,
+        commitment: null,
+        claim: null,
+        profile: null
+    };
+
+    for (let i = 0; i < args.length; i++) {
+        switch (args[i]) {
+            case '--task-dir':
+                options.taskDir = args[++i];
+                break;
+            case '--commitment':
+                options.commitmentPath = args[++i];
+                break;
+            case '--claim':
+                options.claimPath = args[++i];
+                break;
+            case '--profile':
+                options.profilePath = args[++i];
+                break;
+            case '--verbose':
+                options.verbose = true;
+                break;
+            case '--help':
+                showHelp();
+                process.exit(0);
+        }
+    }
+
+    return options;
+}
+
+// Show help message
+function showHelp() {
+    console.log(`
+Template Adapter - Verification adapter template
+
+Usage: adapter-template <capability> [options]
+
+Capabilities:
+  template:scan      Scan and analyze input
+  template:validate  Validate configuration
+  template:analyze   Perform detailed analysis
+
+Options:
+  --task-dir <path>      Directory for artifacts (required)
+  --commitment <file>    Path to commitment.json
+  --claim <file>         Path to claim.json
+  --profile <file>       Path to verification profile
+  --verbose              Enable verbose output
+  --help                 Show this help message
+
+Example:
+  adapter-template template:scan \\
+    --task-dir .artifacts/T_123 \\
+    --commitment .artifacts/T_123/commitment.json \\
+    --claim .artifacts/T_123/claim.json \\
+    --profile config/verification.profiles.json
+
+Output:
+  Writes deterministic JSON artifacts to {task-dir}/template/
+`);
+}
+
+// Load JSON file safely
+async function loadJSON(path) {
+    try {
+        const content = await fs.readFile(path, 'utf8');
+        return JSON.parse(content);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return null;
+        }
+        throw error;
+    }
+}
+
+// Main function
+async function main() {
+    const args = process.argv.slice(2);
+
+    if (args.length === 0) {
+        showHelp();
+        process.exit(1);
+    }
+
+    const capability = args[0];
+    const options = parseArgs(args.slice(1));
+
+    // Validate required options
+    if (!options.taskDir) {
+        console.error('Error: --task-dir is required');
+        process.exit(1);
+    }
+
+    // Ensure task directory exists
+    await fs.mkdir(options.taskDir, { recursive: true });
+
+    // Ensure output directory exists
+    const outputDir = join(options.taskDir, 'template');
+    await fs.mkdir(outputDir, { recursive: true });
+
+    // Load input files if provided
+    if (options.commitmentPath) {
+        options.commitment = await loadJSON(options.commitmentPath);
+        if (options.verbose && options.commitment) {
+            console.error(`Loaded commitment for task: ${options.commitment.task_id}`);
+        }
+    }
+
+    if (options.claimPath) {
+        options.claim = await loadJSON(options.claimPath);
+        if (options.verbose && options.claim) {
+            console.error(`Loaded claim with ${options.claim.claim?.units_total || 0} units`);
+        }
+    }
+
+    if (options.profilePath) {
+        options.profile = await loadJSON(options.profilePath);
+        if (options.verbose && options.profile) {
+            console.error(`Loaded profile: ${Object.keys(options.profile).join(', ')}`);
+        }
+    }
+
+    // Execute capability
+    try {
+        let result;
+        let outputFile;
+
+        switch (capability) {
+            case 'template:scan':
+                if (options.verbose) console.error('Executing template:scan...');
+                result = await scan(options);
+                outputFile = join(outputDir, 'scan.json');
+                break;
+
+            case 'template:validate':
+                if (options.verbose) console.error('Executing template:validate...');
+                result = await validate(options);
+                outputFile = join(outputDir, 'validate.json');
+                break;
+
+            case 'template:analyze':
+                if (options.verbose) console.error('Executing template:analyze...');
+                result = await analyze(options);
+                outputFile = join(outputDir, 'analyze.json');
+                break;
+
+            default:
+                console.error(`Unknown capability: ${capability}`);
+                console.error('Run with --help for available capabilities');
+                process.exit(1);
+        }
+
+        // Write output artifact
+        await fs.writeFile(outputFile, JSON.stringify(result, null, 2));
+
+        // Success message to stdout
+        console.log(`✓ ${capability} complete: ${outputFile}`);
+
+        // Exit successfully
+        process.exit(0);
+
+    } catch (error) {
+        // Errors to stderr
+        console.error(`Error executing ${capability}:`, error.message);
+        if (options.verbose) {
+            console.error(error.stack);
+        }
+
+        // Exit with error code
+        // Note: Adapters should exit 0 even when checks fail
+        // Non-zero exit means the adapter itself crashed
+        process.exit(1);
+    }
+}
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught exception:', error.message);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
+// Run main function
+main().catch(error => {
+    console.error('Fatal error:', error);
+    process.exit(1);
+});

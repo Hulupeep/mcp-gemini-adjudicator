@@ -1,17 +1,15 @@
 {
   "name": "api-adapter",
   "version": "1.0.0",
-  "description": "API verification adapter for endpoint testing and response validation",
+  "description": "API schema validation adapter for response verification",
   "entry": "bin/adapter-api",
   "capabilities": [
-    "api:endpoints",
-    "api:responses",
-    "api:auth",
-    "api:rate-limits"
+    "api:check",
+    "api:latency"
   ],
   "sandbox": {
-    "tools": ["curl", "jq", "node"],
-    "timeout": 60,
+    "tools": ["node", "curl", "jq"],
+    "timeout": 30,
     "network": true
   }
 }

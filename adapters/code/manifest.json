@@ -8,7 +8,8 @@
     "code:lint",
     "code:tests",
     "code:coverage",
-    "code:build"
+    "code:build",
+    "code:map-functions"
   ],
   "sandbox": {
     "tools": ["git", "npm", "node", "eslint", "jest"],

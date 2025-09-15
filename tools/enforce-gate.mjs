@@ -191,6 +191,184 @@ async function enforceGate(artifactsPath, profilesPath, dryRun = false) {
         }
     }
 
+    // Check 8: API Schema Validation (for API tasks)
+    if (taskType === 'api' || taskType === 'api_scrape') {
+        // Try to load schema_result.json if it exists
+        const schemaResultPath = artifactsPath.replace('artifacts.json', 'api/schema_result.json');
+        try {
+            const schemaResult = JSON.parse(await fs.readFile(schemaResultPath, 'utf8'));
+
+            // Check if profile requires schema validation
+            const requiresSchema = profile.schema_required || profile.api_scrape?.schema_required;
+
+            if (requiresSchema) {
+                verdict.checks.push({
+                    name: 'api_schema_validation',
+                    schema_id: schemaResult.schema_id,
+                    endpoint: schemaResult.endpoint,
+                    ok: schemaResult.ok,
+                    errors: schemaResult.errors?.length || 0,
+                    passed: schemaResult.ok
+                });
+
+                if (!schemaResult.ok) {
+                    verdict.reasons.push(`API schema validation failed: ${schemaResult.errors?.length || 0} errors`);
+                    if (schemaResult.errors && schemaResult.errors.length > 0) {
+                        // Add first few errors for context
+                        const errorSample = schemaResult.errors.slice(0, 3).join('; ');
+                        verdict.reasons.push(`  Errors: ${errorSample}`);
+                    }
+                    verdict.status = 'fail';
+                    verdict.gate_type = 'SCHEMA_MISMATCH';
+                }
+            }
+
+            // Check latency budget if specified
+            if (profile.api_scrape?.latency_budget_ms && schemaResult.response_time_ms) {
+                if (schemaResult.response_time_ms > profile.api_scrape.latency_budget_ms) {
+                    verdict.checks.push({
+                        name: 'api_latency_budget',
+                        budget_ms: profile.api_scrape.latency_budget_ms,
+                        actual_ms: schemaResult.response_time_ms,
+                        passed: false
+                    });
+                    verdict.reasons.push(`API response time ${schemaResult.response_time_ms}ms exceeds budget ${profile.api_scrape.latency_budget_ms}ms`);
+                    verdict.status = 'fail';
+                }
+            }
+        } catch (e) {
+            // No schema_result.json or error reading it
+            if (e.code !== 'ENOENT') {
+                console.error('Warning: Error reading schema_result.json:', e.message);
+            }
+
+            // If schema is required but no results found, fail
+            const requiresSchema = profile.schema_required || profile.api_scrape?.schema_required;
+            if (requiresSchema) {
+                verdict.checks.push({
+                    name: 'api_schema_validation',
+                    error: 'No schema validation results found',
+                    passed: false
+                });
+                verdict.reasons.push('API schema validation required but no results found');
+                verdict.status = 'fail';
+            }
+        }
+    }
+
+    // Check 9: Function/Endpoint mapping confidence (for code tasks)
+    if (taskType === 'code' || taskType === 'code_update') {
+        // Try to load function_map.json if it exists
+        const functionMapPath = artifactsPath.replace('artifacts.json', 'function_map.json');
+        try {
+            const functionMap = JSON.parse(await fs.readFile(functionMapPath, 'utf8'));
+
+            // Check if commitment specifies required functions/endpoints
+            const requiredFunctions = commitment.requirements?.functions || [];
+            const requiredEndpoints = commitment.requirements?.endpoints || [];
+            const totalRequired = requiredFunctions.length + requiredEndpoints.length;
+
+            // Also check if claim lists specific units that look like functions
+            const claimedUnits = claim.claim?.units_list || [];
+            const functionUnits = claimedUnits.filter(u =>
+                u.startsWith('func:') ||
+                u.startsWith('function:') ||
+                u.startsWith('ep:') ||
+                u.startsWith('endpoint:') ||
+                u.includes('::') || // class methods
+                u.includes('.') && !u.includes('/') // module functions
+            );
+
+            // Use the larger of commitment requirements or claimed function units
+            const expectedCount = Math.max(totalRequired, functionUnits.length);
+
+            if (expectedCount > 0) {
+                // Count matched functions with certainty
+                const matchedCertain = functionMap.matched?.filter(m => m.certainty === 'certain') || [];
+                const matchedFuzzy = functionMap.matched?.filter(m => m.certainty === 'fuzzy') || [];
+                const unmatched = functionMap.unmatched_claims || [];
+
+                // Check if we have function_certainty_required setting
+                const certaintyCriteria = profile.function_certainty_required ||
+                                        functionMap.confidence_threshold ||
+                                        'fuzzy'; // default to accepting fuzzy matches
+
+                // Determine if we have enough matches based on certainty criteria
+                let sufficientMatches = false;
+                let actualMatched = 0;
+
+                if (certaintyCriteria === 'certain') {
+                    // Only certain matches count
+                    actualMatched = matchedCertain.length;
+                    sufficientMatches = matchedCertain.length >= expectedCount;
+                } else {
+                    // Both certain and fuzzy matches count
+                    actualMatched = matchedCertain.length + matchedFuzzy.length;
+                    sufficientMatches = actualMatched >= expectedCount;
+                }
+
+                if (!sufficientMatches) {
+                    // DIFF_MISMATCH: Claimed functions not found in actual changes
+                    verdict.checks.push({
+                        name: 'function_mapping',
+                        expected: expectedCount,
+                        matched_certain: matchedCertain.length,
+                        matched_fuzzy: matchedFuzzy.length,
+                        unmatched: unmatched.length,
+                        certainty_required: certaintyCriteria,
+                        passed: false
+                    });
+
+                    // Build detailed failure message
+                    let failureMsg = `DIFF_MISMATCH: Expected ${expectedCount} functions/endpoints, `;
+                    if (certaintyCriteria === 'certain') {
+                        failureMsg += `found only ${matchedCertain.length} with certainty`;
+                    } else {
+                        failureMsg += `found only ${actualMatched} total (${matchedCertain.length} certain, ${matchedFuzzy.length} fuzzy)`;
+                    }
+
+                    if (unmatched.length > 0) {
+                        failureMsg += `. Missing: ${unmatched.join(', ')}`;
+                    }
+
+                    verdict.reasons.push(failureMsg);
+                    verdict.status = 'fail';
+                    verdict.gate_type = 'DIFF_MISMATCH'; // Mark specific gate type
+                } else {
+                    // All claimed functions found
+                    verdict.checks.push({
+                        name: 'function_mapping',
+                        expected: expectedCount,
+                        matched_certain: matchedCertain.length,
+                        matched_fuzzy: matchedFuzzy.length,
+                        certainty_required: certaintyCriteria,
+                        passed: true
+                    });
+                }
+
+                // Also check for unclaimed significant changes
+                if (functionMap.unmatched_diffs && functionMap.unmatched_diffs.length > 0) {
+                    const significantUnclaimed = functionMap.unmatched_diffs.filter(d => d.significant !== false);
+                    if (significantUnclaimed.length > 0 && profile.reject_unclaimed_changes) {
+                        verdict.checks.push({
+                            name: 'unclaimed_changes',
+                            count: significantUnclaimed.length,
+                            files: [...new Set(significantUnclaimed.map(d => d.file))],
+                            passed: false
+                        });
+                        verdict.reasons.push(`Found ${significantUnclaimed.length} unclaimed code changes`);
+                        verdict.status = 'fail';
+                    }
+                }
+            }
+        } catch (e) {
+            // No function_map.json or error reading it - not a failure, just skip this check
+            if (e.code !== 'ENOENT') {
+                console.error('Warning: Error reading function_map.json:', e.message);
+            }
+        }
+    }
+
     // If no failures found and we ran checks, mark as pass
     if (verdict.status === 'inconclusive' && verdict.checks.length > 0) {
         const allPassed = verdict.checks.every(c => c.passed !== false);

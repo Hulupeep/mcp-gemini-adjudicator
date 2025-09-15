@@ -1,0 +1,32 @@
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "test",
+  "task_id": "local_units",
+  "timestamp": "2024-01-15T10:00:00Z",
+  "claim": {
+    "type": "code_update",
+    "units_total": 5,
+    "units_list": [
+      "src/app.js",
+      "src/utils.js",
+      "src/database.js",
+      "tests/app.test.js",
+      "tests/utils.test.js"
+    ],
+    "scope": {
+      "repo_root": "/test/repo",
+      "files": [
+        "src/app.js",
+        "src/utils.js",
+        "src/database.js",
+        "tests/app.test.js",
+        "tests/utils.test.js"
+      ]
+    },
+    "declared": {
+      "intent": "Update application with new features",
+      "approach": "TDD with comprehensive testing",
+      "completion_status": "complete"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "added": ["file3.js"],
+  "modified": ["file1.js", "file2.js"],
+  "deleted": []
+}

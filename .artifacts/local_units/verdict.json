@@ -1,0 +1,53 @@
+{
+  "task_id": "local_units",
+  "timestamp": "2024-01-15T10:05:00Z",
+  "status": "pass",
+  "reasons": ["All units successfully verified"],
+  "per_unit": [
+    {
+      "id": "src/app.js",
+      "unit_type": "file",
+      "ok": true,
+      "reason": "File modified successfully"
+    },
+    {
+      "id": "src/utils.js",
+      "unit_type": "file",
+      "ok": true,
+      "reason": "File modified successfully"
+    },
+    {
+      "id": "src/database.js",
+      "unit_type": "file",
+      "ok": false,
+      "reason": "File not found - may have been renamed"
+    },
+    {
+      "id": "tests/app.test.js",
+      "unit_type": "file",
+      "ok": true,
+      "reason": "Tests added and passing"
+    },
+    {
+      "id": "tests/utils.test.js",
+      "unit_type": "file",
+      "ok": true,
+      "reason": "Tests added and passing"
+    }
+  ],
+  "metrics": {
+    "files_processed": 5,
+    "files_modified": 4,
+    "tests_passed": 25,
+    "tests_failed": 0,
+    "coverage": 92.5,
+    "lint_errors": 0,
+    "build_time_ms": 1234
+  },
+  "evidence": {
+    "total_files": 5,
+    "files_checked": ["src/app.js", "src/utils.js", "src/database.js", "tests/app.test.js", "tests/utils.test.js"],
+    "coverage_percent": 92.5,
+    "lint_clean": true
+  }
+}

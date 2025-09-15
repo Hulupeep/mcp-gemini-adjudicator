@@ -1,0 +1,78 @@
+{
+  "schema": "template.scan/v1.0",
+  "timestamp": "2025-09-15T20:58:03.178Z",
+  "task_id": "T_test_fixture",
+  "scan_type": "template",
+  "items_scanned": [
+    {
+      "id": "config/settings.json",
+      "type": "json",
+      "status": "scanned",
+      "hash": "980db14c",
+      "size": 20,
+      "attributes": {
+        "extension": "json",
+        "depth": 1
+      }
+    },
+    {
+      "id": "docs/README.md",
+      "type": "markdown",
+      "status": "scanned",
+      "hash": "0b5ca119",
+      "size": 14,
+      "attributes": {
+        "extension": "md",
+        "depth": 1
+      }
+    },
+    {
+      "id": "src/app.js",
+      "type": "javascript",
+      "status": "scanned",
+      "hash": "c72a907a",
+      "size": 10,
+      "attributes": {
+        "extension": "js",
+        "depth": 1
+      }
+    },
+    {
+      "id": "src/utils.ts",
+      "type": "typescript",
+      "status": "scanned",
+      "hash": "39b2554f",
+      "size": 12,
+      "attributes": {
+        "extension": "ts",
+        "depth": 1
+      }
+    },
+    {
+      "id": "tests/app.test.js",
+      "type": "javascript",
+      "status": "scanned",
+      "hash": "53220c0f",
+      "size": 17,
+      "attributes": {
+        "extension": "js",
+        "depth": 1,
+        "is_test": true
+      }
+    }
+  ],
+  "summary": {
+    "total_items": 5,
+    "processed": 5,
+    "skipped": 0,
+    "errors": 0
+  },
+  "metadata": {
+    "profile": "default"
+  },
+  "metrics": {
+    "avg_item_size": 15,
+    "unique_types": 4,
+    "scan_complete": true
+  }
+}

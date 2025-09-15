@@ -295,4 +295,5 @@ debug-consensus/
 consensus-cache/
 
 # Generated example files (keep templates)
-examples/generated/
+examples/generated/.artifacts/
+*.sqlite*

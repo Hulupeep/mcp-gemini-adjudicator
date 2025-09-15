@@ -1,0 +1,16 @@
+{
+  "task_id": "T_test_fixture",
+  "timestamp": "2024-01-15T09:55:00Z",
+  "type": "template",
+  "source": "test",
+  "context": {
+    "user": "test-user",
+    "project": "template-adapter",
+    "environment": "development"
+  },
+  "requirements": {
+    "scan_all_units": true,
+    "validate_schema": true,
+    "generate_insights": true
+  }
+}

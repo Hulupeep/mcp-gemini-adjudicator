@@ -100,6 +100,36 @@ export class VerificationStorageSQLite {
             CREATE INDEX IF NOT EXISTS idx_incomplete_task_id ON incomplete_tasks(task_id);
         `);
 
+        // Units table for per-unit verification results
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS units (
+                task_id   TEXT NOT NULL,
+                unit_id   TEXT NOT NULL,
+                unit_type TEXT NOT NULL,
+                claimed   INTEGER NOT NULL,
+                verified  INTEGER NOT NULL,
+                reason    TEXT,
+                created_at TEXT DEFAULT (datetime('now')),
+                PRIMARY KEY (task_id, unit_id)
+            )
+        `);
+
+        // Index for fast task lookups
+        this.db.exec(`
+            CREATE INDEX IF NOT EXISTS idx_units_task ON units(task_id);
+        `);
+
+        // Task metrics table
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS task_metrics (
+                task_id   TEXT NOT NULL,
+                k         TEXT NOT NULL,
+                v         REAL,
+                created_at TEXT DEFAULT (datetime('now')),
+                PRIMARY KEY (task_id, k, created_at)
+            )
+        `);
+
         // Add trigger to update updated_at
         this.db.exec(`
             CREATE TRIGGER IF NOT EXISTS update_sessions_timestamp
@@ -490,6 +520,111 @@ export class VerificationStorageSQLite {
     }
 
     /**
+     * Save per-unit verification results
+     */
+    saveUnits(taskId, perUnit = [], claim = null) {
+        const up = this.db.prepare(`
+            INSERT INTO units (task_id, unit_id, unit_type, claimed, verified, reason)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(task_id, unit_id) DO UPDATE SET
+                unit_type=excluded.unit_type,
+                claimed=excluded.claimed,
+                verified=excluded.verified,
+                reason=excluded.reason
+        `);
+
+        const claimedSet = new Set(claim?.claim?.units_list || []);
+
+        const typeOf = (id) => {
+            if (id.startsWith('file:')) return 'file';
+            if (id.startsWith('func:')) return 'func';
+            if (id.startsWith('ep:')) return 'ep';
+            if (id.startsWith('url:')) return 'url';
+            if (id.startsWith('row:')) return 'row';
+            // Infer type from extension or pattern
+            if (id.endsWith('.js') || id.endsWith('.ts') || id.endsWith('.py')) return 'file';
+            if (id.includes('://')) return 'url';
+            if (id.includes('/api/') || id.startsWith('/')) return 'endpoint';
+            return 'unit';
+        };
+
+        const tx = this.db.transaction(() => {
+            for (const u of perUnit) {
+                const id = u.id || u.unit_id || '';
+                const t = u.unit_type || typeOf(id);
+                const claimed = claimedSet.has(id) ? 1 : 0;
+                const verified = u.ok || u.verified ? 1 : 0;
+                const reason = u.reason || null;
+
+                up.run(taskId, id, t, claimed, verified, reason);
+                claimedSet.delete(id);
+            }
+
+            // Add missing units (claimed but not verified)
+            for (const id of claimedSet) {
+                up.run(taskId, id, typeOf(id), 1, 0, 'MISSING_UNIT (claimed but not verified)');
+            }
+        });
+
+        tx();
+    }
+
+    /**
+     * Save task metrics
+     */
+    saveMetrics(taskId, metrics = {}) {
+        const ins = this.db.prepare(`INSERT INTO task_metrics (task_id, k, v) VALUES (?, ?, ?)`);
+
+        const tx = this.db.transaction(() => {
+            Object.entries(metrics).forEach(([k, v]) => {
+                ins.run(taskId, k, Number(v));
+            });
+        });
+
+        tx();
+    }
+
+    /**
+     * Get units for a task
+     */
+    getUnits(taskId) {
+        const stmt = this.db.prepare(`
+            SELECT unit_id, unit_type, claimed, verified, reason, created_at
+            FROM units
+            WHERE task_id = ?
+            ORDER BY unit_id
+        `);
+
+        return stmt.all(taskId);
+    }
+
+    /**
+     * Get task metrics
+     */
+    getTaskMetrics(taskId) {
+        const stmt = this.db.prepare(`
+            SELECT k, v, created_at
+            FROM task_metrics
+            WHERE task_id = ?
+            ORDER BY created_at DESC
+        `);
+
+        const rows = stmt.all(taskId);
+        const metrics = {};
+
+        // Get latest value for each key
+        const seen = new Set();
+        for (const row of rows) {
+            if (!seen.has(row.k)) {
+                metrics[row.k] = row.v;
+                seen.add(row.k);
+            }
+        }
+
+        return metrics;
+    }
+
+    /**
      * Close database connection
      */
     close() {
@@ -501,3 +636,16 @@ export class VerificationStorageSQLite {
 
 // Export singleton instance
 export const verificationStorage = new VerificationStorageSQLite();
+
+// Export helper functions for external use
+export function saveUnits(db, taskId, perUnit = [], claim = null) {
+    const storage = new VerificationStorageSQLite();
+    storage.db = db;
+    storage.saveUnits(taskId, perUnit, claim);
+}
+
+export function saveMetrics(db, taskId, metrics = {}) {
+    const storage = new VerificationStorageSQLite();
+    storage.db = db;
+    storage.saveMetrics(taskId, metrics);
+}

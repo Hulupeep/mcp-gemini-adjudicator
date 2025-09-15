@@ -745,6 +745,12 @@ node -e "
 
 We welcome contributions! Here's how to get started:
 
+### 📚 Documentation
+
+- **[Contributing Guide](CONTRIBUTING.md)** - Development setup, standards, and PR guidelines
+- **[Adapter Documentation](docs/ADAPTERS.md)** - How to build verification adapters
+- **[Adapter Template](packages/adapter-template)** - Quick-start template for new adapters
+
 ### Development Setup
 
 ```bash

@@ -1,0 +1,33 @@
+{
+  "task_id": "T_ci_test",
+  "generated_at": "2024-01-15T12:10:00Z",
+  "files": [
+    "claim.json",
+    "commitment.json",
+    "diff.json",
+    "diff_names.json",
+    "lint.json"
+  ],
+  "artifacts": {
+    "claim.json": {
+      "size": 416,
+      "sha256": "87f42b9539f773b6e1696434470d2e60ab001ff93dd335b02adf5325eccab14a"
+    },
+    "commitment.json": {
+      "size": 96,
+      "sha256": "aa2dfac4f76a822f04afa72b89bd73ab878d1d707088247023676aaaed18980a"
+    },
+    "diff.json": {
+      "size": 102,
+      "sha256": "4f7dc92f797c2cb100a0cb6eb88514003470a294201c7513b7a5ed01623d670e"
+    },
+    "diff_names.json": {
+      "size": 72,
+      "sha256": "3df3d227c0641b59bceb75da34b21ac610ba915928fa92dd86b0371b1e493aed"
+    },
+    "lint.json": {
+      "size": 69,
+      "sha256": "dae55f0501dbeb65ff5671e2fd8fdea2e0b7311d316eb78483a11b34cad6a3bf"
+    }
+  }
+}

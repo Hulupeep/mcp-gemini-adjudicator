@@ -1,0 +1,26 @@
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "claude",
+  "task_id": "T_func_test",
+  "timestamp": "2024-01-15T14:05:00Z",
+  "claim": {
+    "type": "code_update",
+    "units_total": 5,
+    "units_list": [
+      "func:authenticate",
+      "func:validateToken",
+      "func:refreshToken",
+      "endpoint:/api/login",
+      "endpoint:/api/logout"
+    ],
+    "scope": {
+      "repo_root": "/test",
+      "files": ["auth.js", "api.js"]
+    },
+    "declared": {
+      "intent": "Implement authentication system",
+      "approach": "JWT-based authentication",
+      "completion_status": "complete"
+    }
+  }
+}

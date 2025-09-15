@@ -1,0 +1,6 @@
+{
+  "files_modified": ["file1.js", "file2.js"],
+  "files_created": ["file3.js"],
+  "files_deleted": [],
+  "total_changes": 42
+}

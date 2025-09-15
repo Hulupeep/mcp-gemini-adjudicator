@@ -1,0 +1,13 @@
+{
+  "task_id": "T_api",
+  "timestamp": "2024-01-15T14:30:00Z",
+  "artifacts": [
+    {
+      "type": "api:check",
+      "path": "api/schema_result.json",
+      "ok": false,
+      "errors": 2,
+      "schema_id": "https://example.com/user.schema.json"
+    }
+  ]
+}

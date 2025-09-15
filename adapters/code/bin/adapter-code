@@ -13,6 +13,7 @@ import { runDiff } from '../src/diff.mjs';
 import { runLint } from '../src/lint.mjs';
 import { runTests } from '../src/tests.mjs';
 import { runCoverage } from '../src/coverage.mjs';
+import { mapFunctions } from '../src/map-functions.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -79,6 +80,13 @@ async function main() {
             case 'code:coverage':
                 await runCoverage(options);
                 console.log(`✓ Coverage analysis complete: ${options.taskDir}/coverage.json`);
+                break;
+
+            case 'code:map-functions':
+                const functionMap = await mapFunctions(options);
+                const outputPath = join(options.taskDir, 'function_map.json');
+                await fs.writeFile(outputPath, JSON.stringify(functionMap, null, 2));
+                console.log(`✓ Function mapping complete: ${outputPath}`);
                 break;
 
             case 'code:all':
@@ -164,11 +172,12 @@ Code Adapter CLI - Code verification for MCP Gemini Adjudicator
 Usage: adapter-code <command> [options]
 
 Commands:
-  code:diff      Analyze code changes and modified files
-  code:lint      Run linting and code quality checks
-  code:tests     Execute test suite and report results
-  code:coverage  Generate code coverage metrics
-  code:all       Run all code verification adapters
+  code:diff         Analyze code changes and modified files
+  code:lint         Run linting and code quality checks
+  code:tests        Execute test suite and report results
+  code:coverage     Generate code coverage metrics
+  code:map-functions Map functions/endpoints with confidence levels
+  code:all          Run all code verification adapters
 
 Options:
   --task-dir <path>      Directory for artifacts (default: .artifacts/current)

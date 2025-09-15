@@ -1,0 +1,81 @@
+{
+  "schema": "function_map/v1.0",
+  "timestamp": "2025-09-15T22:14:59.450Z",
+  "task_id": "T_func_test",
+  "matched": [
+    {
+      "id": "endpoint:/api/login",
+      "file": "api.js",
+      "name": "/api/login",
+      "lines": [
+        7,
+        12
+      ],
+      "certainty": "certain",
+      "type": "endpoint"
+    },
+    {
+      "id": "endpoint:/api/logout",
+      "file": "api.js",
+      "name": "/api/logout",
+      "lines": [
+        18,
+        23
+      ],
+      "certainty": "certain",
+      "type": "endpoint"
+    },
+    {
+      "id": "func:authenticate",
+      "file": "auth.js",
+      "name": "authenticate",
+      "lines": [
+        12,
+        22
+      ],
+      "certainty": "certain",
+      "type": "function"
+    },
+    {
+      "id": "func:refreshToken",
+      "file": "unknown",
+      "name": "refreshToken",
+      "lines": [
+        0,
+        0
+      ],
+      "certainty": "fuzzy",
+      "type": "function",
+      "note": "Found in diff but location uncertain"
+    },
+    {
+      "id": "func:validateToken",
+      "file": "auth.js",
+      "name": "validateToken",
+      "lines": [
+        30,
+        40
+      ],
+      "certainty": "certain",
+      "type": "function"
+    }
+  ],
+  "unmatched_claims": [],
+  "unmatched_diffs": [
+    {
+      "file": "api.js",
+      "type": "function",
+      "name": "logActivity",
+      "lines": [
+        24,
+        34
+      ]
+    }
+  ],
+  "statistics": {
+    "total_claimed": 5,
+    "matched_certain": 4,
+    "matched_fuzzy": 1,
+    "unmatched": 0
+  }
+}

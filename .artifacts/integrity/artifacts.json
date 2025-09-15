@@ -1,0 +1,38 @@
+{
+  "task_dir": ".artifacts/integrity",
+  "timestamp": "2025-09-15T22:33:43.205Z",
+  "files": [
+    {
+      "path": "artifacts.json",
+      "size": 0,
+      "modified": "2025-09-15T22:33:43.178Z",
+      "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test.json",
+      "size": 17,
+      "modified": "2025-09-15T22:33:37.046Z",
+      "checksum": "9094739dc74f25533b47c465e57bac01101f6c23565960c1d3cd56984532b74e"
+    }
+  ],
+  "checksums": {
+    "artifacts.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "test.json": "9094739dc74f25533b47c465e57bac01101f6c23565960c1d3cd56984532b74e"
+  },
+  "summary": {
+    "diff": null,
+    "lint": null,
+    "tests": null,
+    "coverage": null
+  },
+  "metrics": {
+    "total_files": 2,
+    "has_diff": false,
+    "has_lint": false,
+    "has_tests": false,
+    "has_coverage": false,
+    "lint_passed": null,
+    "tests_passed": null,
+    "coverage_pct": null
+  }
+}

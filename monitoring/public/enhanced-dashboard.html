@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Verification Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        .tasks-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .task-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-item:hover {
+            background: #f9fafb;
+            transform: translateX(5px);
+        }
+
+        .task-item.selected {
+            background: #eef2ff;
+            border-color: #667eea;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .task-id {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .task-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .task-meta {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .details-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .units-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .units-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .units-table th {
+            background: #f3f4f6;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .units-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .units-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .unit-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .unit-type {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .unit-type.file { background: #dbeafe; color: #1e40af; }
+        .unit-type.func { background: #fce7f3; color: #a21caf; }
+        .unit-type.url { background: #fed7aa; color: #c2410c; }
+        .unit-type.endpoint { background: #d9f99d; color: #4d7c0f; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-item {
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .type-distribution {
+            margin-top: 20px;
+        }
+
+        .type-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .type-label {
+            width: 80px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .type-progress {
+            flex: 1;
+            height: 24px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .type-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .type-count {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #666;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Enhanced Verification Dashboard</h1>
+            <div class="subtitle">Real-time AI task verification with per-unit granularity</div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-label">Total Tasks</div>
+                <div class="stat-value" id="totalTasks">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-value" id="successRate">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Units</div>
+                <div class="stat-value" id="totalUnits">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Units Verified</div>
+                <div class="stat-value" id="unitsVerified">-</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Tasks</h2>
+                </div>
+                <div class="filter-controls">
+                    <button class="filter-btn active" onclick="filterTasks('all')">All</button>
+                    <button class="filter-btn" onclick="filterTasks('pass')">Passed</button>
+                    <button class="filter-btn" onclick="filterTasks('fail')">Failed</button>
+                    <button class="filter-btn" onclick="filterTasks('pending')">Pending</button>
+                </div>
+                <div class="task-list" id="taskList">
+                    <div class="loading">Loading tasks...</div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h2 class="section-title">Task Details</h2>
+                <div id="taskDetails">
+                    <div class="empty-state">Select a task to view details</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allTasks = [];
+        let currentFilter = 'all';
+        let selectedTaskId = null;
+
+        // Initialize dashboard
+        async function init() {
+            await loadStats();
+            await loadTasks();
+            setInterval(refresh, 5000); // Refresh every 5 seconds
+        }
+
+        // Load global statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('http://localhost:3033/api/stats');
+                const stats = await response.json();
+
+                document.getElementById('totalTasks').textContent = stats.tasks?.total_tasks || 0;
+                document.getElementById('successRate').textContent = stats.success_rate || 'N/A';
+                document.getElementById('totalUnits').textContent = stats.units?.total_units || 0;
+                document.getElementById('unitsVerified').textContent = stats.units?.total_verified || 0;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load tasks list
+        async function loadTasks() {
+            try {
+                const response = await fetch('http://localhost:3033/api/tasks');
+                allTasks = await response.json();
+                renderTaskList();
+            } catch (error) {
+                console.error('Failed to load tasks:', error);
+                document.getElementById('taskList').innerHTML = '<div class="empty-state">Failed to load tasks</div>';
+            }
+        }
+
+        // Render filtered task list
+        function renderTaskList() {
+            const filteredTasks = allTasks.filter(task => {
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'pass') return task.verdict === 'PASS';
+                if (currentFilter === 'fail') return task.verdict === 'FAIL';
+                if (currentFilter === 'pending') return task.status === 'pending';
+                return true;
+            });
+
+            const taskList = document.getElementById('taskList');
+
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = '<div class="empty-state">No tasks found</div>';
+                return;
+            }
+
+            taskList.innerHTML = filteredTasks.map(task => `
+                <div class="task-item ${task.task_id === selectedTaskId ? 'selected' : ''}"
+                     onclick="selectTask('${task.task_id}')">
+                    <div class="task-header">
+                        <span class="task-id">${task.task_id}</span>
+                        <span class="task-status status-${(task.verdict || task.status || 'pending').toLowerCase()}">
+                            ${task.verdict || task.status || 'PENDING'}
+                        </span>
+                    </div>
+                    <div class="task-meta">
+                        <div>📅 ${new Date(task.timestamp).toLocaleString()}</div>
+                        <div>📊 Expected: ${task.expected_count} | Actual: ${task.actual_count || 0}</div>
+                        ${task.verdict_reason ? `<div>💭 ${task.verdict_reason}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter tasks
+        function filterTasks(filter) {
+            currentFilter = filter;
+
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderTaskList();
+        }
+
+        // Select and load task details
+        async function selectTask(taskId) {
+            selectedTaskId = taskId;
+            renderTaskList(); // Update selection highlight
+
+            try {
+                const response = await fetch(`http://localhost:3033/api/tasks/${taskId}`);
+                const data = await response.json();
+                renderTaskDetails(data);
+            } catch (error) {
+                console.error('Failed to load task details:', error);
+                document.getElementById('taskDetails').innerHTML = '<div class="empty-state">Failed to load task details</div>';
+            }
+        }
+
+        // Render task details with units table
+        function renderTaskDetails(data) {
+            const { session, units, metrics, summary } = data;
+
+            // Group units by type
+            const unitsByType = {};
+            units.forEach(unit => {
+                if (!unitsByType[unit.unit_type]) {
+                    unitsByType[unit.unit_type] = [];
+                }
+                unitsByType[unit.unit_type].push(unit);
+            });
+
+            // Calculate type distribution
+            const typeStats = Object.entries(unitsByType).map(([type, items]) => ({
+                type,
+                total: items.length,
+                verified: items.filter(u => u.verified === 1).length,
+                claimed: items.filter(u => u.claimed === 1).length
+            }));
+
+            const detailsHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 10px;">Summary</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Total Units</div>
+                            <div class="metric-value">${summary.total_units}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Claimed</div>
+                            <div class="metric-value">${summary.claimed}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Verified</div>
+                            <div class="metric-value">${summary.verified}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Failed</div>
+                            <div class="metric-value">${summary.failed}</div>
+                        </div>
+                    </div>
+                </div>
+
+                ${typeStats.length > 0 ? `
+                    <div class="type-distribution">
+                        <h3 style="margin-bottom: 10px;">Type Distribution</h3>
+                        ${typeStats.map(stat => `
+                            <div class="type-bar">
+                                <div class="type-label">${stat.type}</div>
+                                <div class="type-progress">
+                                    <div class="type-fill" style="width: ${(stat.verified / stat.total * 100)}%"></div>
+                                    <div class="type-count">${stat.verified}/${stat.total}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="units-table">
+                    <h3 style="margin-bottom: 10px;">Units (${units.length})</h3>
+                    ${units.length > 0 ? `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Unit ID</th>
+                                    <th>Type</th>
+                                    <th>Claimed</th>
+                                    <th>Verified</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${units.map(unit => `
+                                    <tr>
+                                        <td style="font-family: monospace; font-size: 12px;">
+                                            ${unit.unit_id.length > 40
+                                                ? unit.unit_id.substring(0, 40) + '...'
+                                                : unit.unit_id}
+                                        </td>
+                                        <td>
+                                            <span class="unit-type ${unit.unit_type}">${unit.unit_type}</span>
+                                        </td>
+                                        <td>
+                                            <span class="unit-status">
+                                                ${unit.claimed === 1
+                                                    ? '<span style="color: #10b981;">✓</span>'
+                                                    : '<span style="color: #ef4444;">✗</span>'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="unit-status">
+                                                ${unit.verified === 1
+                                                    ? '<span style="color: #10b981;">✓</span>'
+                                                    : '<span style="color: #ef4444;">✗</span>'}
+                                            </span>
+                                        </td>
+                                        <td style="font-size: 12px; color: #666;">
+                                            ${unit.reason || '-'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<div class="empty-state">No units found</div>'}
+                </div>
+
+                ${Object.keys(metrics).length > 0 ? `
+                    <div style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 10px;">Metrics</h3>
+                        <div class="metrics-grid">
+                            ${Object.entries(metrics).map(([key, value]) => `
+                                <div class="metric-item">
+                                    <div class="metric-label">${key.replace(/_/g, ' ')}</div>
+                                    <div class="metric-value">${
+                                        typeof value === 'number'
+                                            ? value % 1 === 0 ? value : value.toFixed(2)
+                                            : value
+                                    }</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('taskDetails').innerHTML = detailsHTML;
+        }
+
+        // Refresh data
+        async function refresh() {
+            await loadStats();
+            if (selectedTaskId) {
+                await selectTask(selectedTaskId);
+            }
+        }
+
+        // Start the dashboard
+        init();
+    </script>
+</body>
+</html>

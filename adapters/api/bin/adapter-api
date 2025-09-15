@@ -4,9 +4,10 @@
  */
 
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import { promises as fs } from 'fs';
-import { checkApis } from '../src/check.mjs';
+import { checkApi } from '../src/check.mjs';
+import { measureLatency } from '../src/latency.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,7 +25,9 @@ async function main() {
 
     // Ensure task directory exists
     if (options.taskDir) {
-        await fs.mkdir(options.taskDir, { recursive: true });
+        const apiDir = join(options.taskDir, 'api');
+        await fs.mkdir(apiDir, { recursive: true });
+        options.apiDir = apiDir;
     }
 
     // Load files if provided
@@ -56,8 +59,26 @@ async function main() {
     try {
         switch (command) {
             case 'api:check':
-                await checkApis(options);
-                console.log(`✓ API check complete: ${options.taskDir}/api/check.json`);
+                await checkApi(options);
+                console.log(`✓ API schema check complete: ${options.apiDir}/schema_result.json`);
+                break;
+
+            case 'api:latency':
+                await measureLatency(options);
+                console.log(`✓ Latency measurement complete: ${options.apiDir}/latency.json`);
+                break;
+
+            case 'api:all':
+                // Run all adapters
+                console.log('Running all API verification adapters...');
+
+                await checkApi(options);
+                console.log('  ✓ Schema check complete');
+
+                await measureLatency(options);
+                console.log('  ✓ Latency measurement complete');
+
+                console.log(`\n✓ All API verification complete in ${options.apiDir}/`);
                 break;
 
             default:
@@ -111,6 +132,20 @@ function parseArguments(args) {
                     i++;
                 }
                 break;
+
+            case '--url':
+                if (args[i + 1]) {
+                    options.url = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--schema':
+                if (args[i + 1]) {
+                    options.schemaPath = args[i + 1];
+                    i++;
+                }
+                break;
         }
     }
 
@@ -124,16 +159,27 @@ API Adapter CLI - API endpoint verification
 Usage: adapter-api <command> [options]
 
 Commands:
-  api:check    Check API endpoints and validate schemas
+  api:check         Validate API responses against JSON Schema
+  api:latency       Measure API latency (p50/p95)
+  api:all           Run all API verification adapters
 
 Options:
-  --task-dir <path>      Directory for artifacts
-  --commitment <file>    Path to commitment.json
-  --claim <file>         Path to claim.json
-  --profile <file>       Path to profiles file
+  --task-dir <path>      Directory for artifacts (default: .artifacts/current)
+  --commitment <file>    Path to commitment.json file
+  --claim <file>         Path to claim.json file
+  --profile <file>       Path to verification profiles file
+  --url <url>            API endpoint URL (overrides commitment/profile)
+  --schema <file>        Path to JSON Schema file (overrides commitment/profile)
 
-Example:
-  adapter-api api:check --task-dir .artifacts/T_api_1
+Examples:
+  adapter-api api:check --task-dir .artifacts/T_api_1 --url https://api.example.com/user --schema schema.json
+  adapter-api api:latency --task-dir .artifacts/T_api_1 --url https://api.example.com/user
+  adapter-api api:all --task-dir .artifacts/T_api_1 --commitment commitment.json --profile profiles.json
+
+Output:
+  Each command creates JSON files in the task directory/api/:
+  - schema_result.json
+  - latency.json
 `);
 }
 
