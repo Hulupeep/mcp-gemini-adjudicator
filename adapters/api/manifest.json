@@ -1,0 +1,17 @@
+{
+  "name": "api-adapter",
+  "version": "1.0.0",
+  "description": "API verification adapter for endpoint testing and response validation",
+  "entry": "bin/adapter-api",
+  "capabilities": [
+    "api:endpoints",
+    "api:responses",
+    "api:auth",
+    "api:rate-limits"
+  ],
+  "sandbox": {
+    "tools": ["curl", "jq", "node"],
+    "timeout": 60,
+    "network": true
+  }
+}

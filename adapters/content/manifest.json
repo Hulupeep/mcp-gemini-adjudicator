@@ -1,0 +1,18 @@
+{
+  "name": "content-adapter",
+  "version": "1.0.0",
+  "description": "Content verification adapter for scanning, word counts, and structure",
+  "entry": "bin/adapter-content",
+  "capabilities": [
+    "content:scan",
+    "content:wordcount",
+    "content:headings",
+    "content:images",
+    "content:quotes"
+  ],
+  "sandbox": {
+    "tools": ["node", "wc"],
+    "timeout": 30,
+    "network": false
+  }
+}

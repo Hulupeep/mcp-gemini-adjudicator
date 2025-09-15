@@ -1,0 +1,18 @@
+{
+  "name": "code-adapter",
+  "version": "1.0.0",
+  "description": "Code verification adapter for diff, lint, tests, and coverage",
+  "entry": "bin/adapter-code",
+  "capabilities": [
+    "code:diff",
+    "code:lint",
+    "code:tests",
+    "code:coverage",
+    "code:build"
+  ],
+  "sandbox": {
+    "tools": ["git", "npm", "node", "eslint", "jest"],
+    "timeout": 60,
+    "network": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "links-adapter",
+  "version": "1.0.0",
+  "description": "Link verification adapter for discovery, checking, and resampling",
+  "entry": "bin/adapter-links",
+  "capabilities": [
+    "links:discover",
+    "links:check",
+    "links:resample"
+  ],
+  "sandbox": {
+    "tools": ["curl", "wget", "node"],
+    "timeout": 120,
+    "network": true
+  }
+}

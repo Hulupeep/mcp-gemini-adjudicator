@@ -1,5 +1,106 @@
 # Claude Code Configuration - SPARC Development Environment
 
+## 🔴 CRITICAL: MCP GEMINI ADJUDICATOR - CLAIM JSON REQUIREMENT
+
+**FOR EVERY TASK YOU COMPLETE, YOU MUST:**
+
+1. **Do the work** as requested
+2. **Output a CLAIM JSON** at the end describing what you did
+3. **Save the CLAIM JSON** to `.claude/verification/claim.json`
+
+### CLAIM JSON Format (MANDATORY - verify.claim/v1.1):
+```json
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "claude",
+  "task_id": "task-[timestamp]",
+  "timestamp": "[ISO 8601 timestamp]",
+  "claim": {
+    "type": "content|code|link_check",
+    "units_total": [number created/modified],
+    "units_list": ["file1.md", "file2.md"],
+    "scope": {
+      "repo_root": "/path/to/repo",
+      "targets": ["path/relative/to/repo"],
+      "files": ["path/to/file1", "path/to/file2"],
+      "functions": ["functionName"],
+      "endpoints": ["/api/endpoint"]
+    },
+    "declared": {
+      "intent": "What I intended to do",
+      "approach": "How I approached it",
+      "completion_status": "complete|partial|failed"
+    }
+  }
+}
+```
+
+**IMPORTANT RULES:**
+- **NEVER** include measured facts (word counts, HTTP status codes, etc.)
+- **units_total** MUST equal the length of units_list
+- **timestamp** MUST be in ISO 8601 format
+- **schema** MUST be "verify.claim/v1.1"
+- **actor** MUST be "claude"
+
+**MISSING CLAIM JSON = AUTOMATIC VERIFICATION FAILURE!**
+
+### Example for Content Creation:
+If asked to "Create 3 blog posts about AI, 400 words each", end with:
+```json
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "claude",
+  "task_id": "task-1734567890",
+  "timestamp": "2024-12-18T10:30:00Z",
+  "claim": {
+    "type": "content",
+    "units_total": 3,
+    "units_list": ["ai-future.md", "ai-ethics.md", "ai-education.md"],
+    "scope": {
+      "repo_root": "/home/user/project",
+      "targets": ["testblog"],
+      "files": [
+        "testblog/ai-future.md",
+        "testblog/ai-ethics.md",
+        "testblog/ai-education.md"
+      ]
+    },
+    "declared": {
+      "intent": "Create 3 comprehensive blog posts about AI topics",
+      "approach": "Generated unique content for each post covering different AI aspects",
+      "completion_status": "complete"
+    }
+  }
+}
+```
+
+### Example for Code Modification:
+If asked to "Add error handling to calculator functions", end with:
+```json
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "claude",
+  "task_id": "task-1734567891",
+  "timestamp": "2024-12-18T10:35:00Z",
+  "claim": {
+    "type": "code",
+    "units_total": 4,
+    "units_list": ["add", "subtract", "multiply", "divide"],
+    "scope": {
+      "repo_root": "/home/user/project",
+      "targets": ["src/calculator.js"],
+      "files": ["src/calculator.js"],
+      "functions": ["add", "subtract", "multiply", "divide"]
+    },
+    "declared": {
+      "intent": "Add comprehensive error handling to all calculator functions",
+      "approach": "Added try-catch blocks and input validation to each function",
+      "completion_status": "complete"
+    }
+  }
+}
+```
+
 ## 🚨 CRITICAL: CONCURRENT EXECUTION & FILE MANAGEMENT
 
 **ABSOLUTE RULES**:

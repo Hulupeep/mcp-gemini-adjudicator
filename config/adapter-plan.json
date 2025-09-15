@@ -1,0 +1,37 @@
+{
+  "code": {
+    "order": ["code:diff", "code:lint", "code:tests", "code:coverage", "code:build"],
+    "required": ["code:diff"],
+    "optional": ["code:lint", "code:tests", "code:coverage", "code:build"]
+  },
+  "code_update": {
+    "order": ["code:diff", "code:lint", "code:tests", "code:coverage", "code:build"],
+    "required": ["code:diff", "code:lint"],
+    "optional": ["code:tests", "code:coverage", "code:build"]
+  },
+  "link_check": {
+    "order": ["links:discover", "links:check", "links:resample"],
+    "required": ["links:discover", "links:check"],
+    "optional": ["links:resample"]
+  },
+  "content": {
+    "order": ["content:scan", "content:wordcount", "content:headings", "content:images"],
+    "required": ["content:scan"],
+    "optional": ["content:wordcount", "content:headings", "content:images"]
+  },
+  "api_test": {
+    "order": ["api:endpoints", "api:responses", "api:auth", "api:rate-limits"],
+    "required": ["api:endpoints", "api:responses"],
+    "optional": ["api:auth", "api:rate-limits"]
+  },
+  "db_update": {
+    "order": ["code:diff"],
+    "required": ["code:diff"],
+    "optional": []
+  },
+  "unknown": {
+    "order": [],
+    "required": [],
+    "optional": []
+  }
+}
