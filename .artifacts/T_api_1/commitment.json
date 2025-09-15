@@ -1,0 +1,15 @@
+{
+  "task_id": "T_api_1",
+  "type": "api_check",
+  "profile": "api_basic",
+  "commitments": {
+    "expected_total": 3,
+    "scope": {
+      "endpoints": [
+        {"url": "https://httpstat.us/200", "method": "GET"},
+        {"url": "https://httpstat.us/201", "method": "GET"},
+        {"url": "https://httpstat.us/404", "method": "GET"}
+      ]
+    }
+  }
+}

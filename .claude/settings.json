@@ -44,7 +44,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/xanacan/Dropbox/code/gemini_consensus/.claude/hooks/generate_verification_prompt.sh"
+            "command": ".claude/hooks/pre-task-commitment.sh"
           }
         ]
       }
@@ -71,11 +71,11 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "WriteFile|Edit|Replace|MultiEdit",
+        "matcher": "Write|MultiEdit|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "/home/xanacan/Dropbox/code/gemini_consensus/.claude/hooks/run_verification_direct.sh"
+            "command": ".claude/hooks/post-task-claim.sh"
           }
         ]
       },

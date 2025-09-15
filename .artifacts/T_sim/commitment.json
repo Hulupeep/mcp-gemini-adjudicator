@@ -1,0 +1,10 @@
+{
+  "task_id": "T_sim",
+  "type": "content",
+  "commitments": {
+    "expected_total": 1,
+    "quality": {
+      "word_min": 100
+    }
+  }
+}

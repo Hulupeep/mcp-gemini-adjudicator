@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gemini-adjudicator": {
+      "command": "node",
+      "args": ["/home/xanacan/Dropbox/code/mcp-gemini-adjudicator/index.mjs"],
+      "env": {
+        "GEMINI_API_KEY": "YAIzaSyDpGMUgGW8Y6tElzpzBXNb3x1m5B6Y8sMw",
+        "GEMINI_MODEL": "gemini-2.5-flash-lite"
+      }
+    }
+  }
+}

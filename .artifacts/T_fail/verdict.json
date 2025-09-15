@@ -1,0 +1,26 @@
+{
+  "task_id": "T_fail",
+  "status": "fail",
+  "type": "content",
+  "profile": "content_default",
+  "checks": [
+    {
+      "name": "units_count",
+      "expected": 3,
+      "actual": 1,
+      "passed": false
+    },
+    {
+      "name": "word_min",
+      "file": "test.md",
+      "minimum": 400,
+      "actual": 100,
+      "passed": false
+    }
+  ],
+  "reasons": [
+    "Claimed 1 units but expected 3",
+    "test.md: word count 100 < 400"
+  ],
+  "timestamp": "2025-09-15T20:06:02.408Z"
+}

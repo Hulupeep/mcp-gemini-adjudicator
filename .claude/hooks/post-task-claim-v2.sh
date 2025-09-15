@@ -51,7 +51,23 @@ mkdir -p "$TASK_DIR"
 
 # Copy commitment and claim to task directory
 cp "$COMMITMENT_FILE" "$TASK_DIR/commitment.json"
-[ -f "$CLAIM_FILE" ] && cp "$CLAIM_FILE" "$TASK_DIR/claim.json"
+if [ -f "$CLAIM_FILE" ]; then
+    cp "$CLAIM_FILE" "$TASK_DIR/claim.json"
+
+    # Validate claim against schema (forbid measured results)
+    echo "Validating claim JSON against v1.1 schema" >> "$LOG_FILE"
+    if ! node tools/validate-claim.mjs "$TASK_DIR/claim.json" 2>&1 | tee -a "$LOG_FILE"; then
+        echo "CLAIM_VALIDATION_FAILED" >> "$LOG_FILE"
+        echo "{
+            \"task_id\": \"$TASK_ID\",
+            \"status\": \"error\",
+            \"error\": \"CLAIM_VALIDATION_FAILED\",
+            \"reason\": \"Claim contains forbidden measured fields or invalid structure\",
+            \"timestamp\": \"$(date -Iseconds)\"
+        }" > "$VERDICT_FILE"
+        exit 1
+    fi
+fi
 
 # Get execution plan for this type
 PLAN=$(jq -r --arg t "$TYPE" '.[$t].order[]? // empty' config/adapter-plan.json)
@@ -85,6 +101,7 @@ for CAP in $PLAN; do
                 \"task_id\": \"$TASK_ID\",
                 \"status\": \"error\",
                 \"error\": \"MISSING_ADAPTER:$CAP\",
+                \"missing_artifact\": true,
                 \"timestamp\": \"$(date -Iseconds)\"
             }" > "$VERDICT_FILE"
             exit 2
@@ -120,6 +137,11 @@ for i in "${!ARTIFACTS_COLLECTED[@]}"; do
     cat "${ARTIFACTS_COLLECTED[$i]}" >> "$TASK_DIR/artifacts.json"
 done
 echo "]}" >> "$TASK_DIR/artifacts.json"
+
+# Generate checksums for all artifacts
+echo "Generating checksums.sha256" >> "$LOG_FILE"
+find "$TASK_DIR" -type f ! -name checksums.sha256 -print0 | \
+    xargs -0 sha256sum > "$TASK_DIR/checksums.sha256"
 
 # Run fast gate enforcement (deterministic rules)
 if [ -f "tools/enforce-gate.mjs" ]; then

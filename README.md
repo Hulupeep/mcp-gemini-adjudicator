@@ -2,6 +2,7 @@
 
 > **A self-correcting AI workflow system. Use a Gemini-powered Adjudicator to programmatically verify and supervise your primary AI's work, ensuring reliability and task completion.**
 
+[![Verify Claims](https://github.com/Hulupeep/mcp-gemini-adjudicator/actions/workflows/verify-claims.yml/badge.svg)](https://github.com/Hulupeep/mcp-gemini-adjudicator/actions/workflows/verify-claims.yml)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

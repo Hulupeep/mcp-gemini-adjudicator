@@ -1,0 +1,36 @@
+{
+  "task_id": "task-1757964923",
+  "status": "pass",
+  "units_expected": 3,
+  "units_verified": 3,
+  "per_unit": [
+    {
+      "id": "testblog/ai-education.md",
+      "ok": true,
+      "reason": null
+    },
+    {
+      "id": "testblog/ai-ethics.md",
+      "ok": true,
+      "reason": null
+    },
+    {
+      "id": "testblog/ai-future.md",
+      "ok": true,
+      "reason": null
+    }
+  ],
+  "reasons": [],
+  "metrics": {
+    "completion_rate": 1,
+    "average_word_count": 306,
+    "word_min_compliance": 0
+  },
+  "policy": {
+    "profile": "content_default",
+    "thresholds": {
+      "word_min": 300
+    }
+  },
+  "timestamp": "2025-09-15T19:35:23.956Z"
+}

@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Hulupeep/mcp-gemini-adjudicator/schemas/verify.claim.v1_1.schema.json",
+  "title": "Verify Claim Schema v1.1",
+  "description": "Schema for AI claim declarations - enumeration only, no measured facts",
+  "type": "object",
+  "required": ["schema", "actor", "task_id", "timestamp", "claim"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "verify.claim/v1.1",
+      "description": "Schema version identifier"
+    },
+    "actor": {
+      "type": "string",
+      "enum": ["claude", "gpt", "gemini", "llama", "other"],
+      "description": "AI actor making the claim"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "description": "Unique task identifier"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "claim": {
+      "type": "object",
+      "required": ["type", "units_total", "units_list", "scope"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["content", "code", "link_check", "api_test", "db_update"],
+          "description": "Task type"
+        },
+        "units_total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total units claimed (must equal units_list.length)"
+        },
+        "units_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of unit identifiers"
+        },
+        "scope": {
+          "type": "object",
+          "required": ["repo_root"],
+          "properties": {
+            "repo_root": {
+              "type": "string",
+              "description": "Repository root path"
+            },
+            "targets": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Target paths relative to repo_root"
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "File paths affected"
+            },
+            "functions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Function names affected (for code tasks)"
+            },
+            "endpoints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "API endpoints affected (for API tasks)"
+            }
+          }
+        },
+        "declared": {
+          "type": "object",
+          "properties": {
+            "intent": {
+              "type": "string",
+              "description": "What was intended"
+            },
+            "approach": {
+              "type": "string",
+              "description": "How it was approached"
+            },
+            "completion_status": {
+              "type": "string",
+              "enum": ["complete", "partial", "failed"],
+              "description": "Completion status"
+            }
+          },
+          "description": "Optional declarations of intent"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "not": {
+    "anyOf": [
+      {
+        "properties": {
+          "claim": {
+            "properties": {
+              "word_count": true,
+              "word_min": true,
+              "coverage": true,
+              "coverage_percent": true,
+              "http_status": true,
+              "response_time": true,
+              "test_results": true,
+              "lint_errors": true,
+              "build_status": true
+            }
+          }
+        }
+      }
+    ]
+  },
+  "_forbidden_patterns": {
+    "description": "These patterns indicate measured facts and should cause validation failure",
+    "patterns": [
+      "word_count", "word_min", "word_max",
+      "coverage", "coverage_percent", "coverage_min",
+      "http_status", "status_code", "response_code",
+      "response_time", "latency", "duration",
+      "test_passed", "test_failed", "test_results",
+      "lint_errors", "lint_warnings", "lint_clean",
+      "build_status", "build_success", "compile_errors",
+      "file_size", "line_count", "character_count"
+    ]
+  }
+}

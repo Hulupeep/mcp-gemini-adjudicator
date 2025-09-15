@@ -1,0 +1,26 @@
+{
+  "total_checked": 3,
+  "passed": 0,
+  "failed": 3,
+  "endpoints": {
+    "https://httpstat.us/200": {
+      "status": "error",
+      "response_time": 638
+    },
+    "https://httpstat.us/201": {
+      "status": "error",
+      "response_time": 418
+    },
+    "https://httpstat.us/404": {
+      "status": "error",
+      "response_time": 426
+    }
+  },
+  "schema_validation": {},
+  "response_times": {
+    "https://httpstat.us/200": 638,
+    "https://httpstat.us/201": 418,
+    "https://httpstat.us/404": 426
+  },
+  "timestamp": "2025-09-15T14:10:05.956Z"
+}

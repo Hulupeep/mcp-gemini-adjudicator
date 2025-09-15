@@ -1,0 +1,20 @@
+{
+  "task_id": "T_code_1",
+  "type": "code",
+  "profile": "code_update",
+  "user_instruction": "Add logging to 3 functions and fix lint errors",
+  "commitments": {
+    "expected_total": 3,
+    "quality": {
+      "lint_clean": true,
+      "tests_pass": true,
+      "coverage_min": 80
+    },
+    "scope": {
+      "target_directory": "src",
+      "files": ["src/test-example.js"],
+      "functions": ["getData", "processData", "saveData"]
+    }
+  },
+  "timestamp": "2025-09-15T14:59:42+01:00"
+}

@@ -1,0 +1,9 @@
+{
+  "source_url": "https://example.com",
+  "discovered_count": 1,
+  "urls": [
+    "https://www.iana.org/domains/example"
+  ],
+  "discovery_method": "page_crawl",
+  "timestamp": "2025-09-15T20:24:24.538Z"
+}

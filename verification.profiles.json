@@ -1,0 +1,66 @@
+{
+  "content_default": {
+    "word_min": 400,
+    "word_tolerance": 0,
+    "strict": true,
+    "description": "Default profile for content creation tasks"
+  },
+  "code_update": {
+    "lint_required": true,
+    "tests_required": true,
+    "coverage_min": 80,
+    "build_required": false,
+    "description": "Basic code update verification"
+  },
+  "code_critical": {
+    "lint_required": true,
+    "tests_required": true,
+    "coverage_min": 90,
+    "build_required": true,
+    "description": "Critical code with high quality requirements"
+  },
+  "code_prototype": {
+    "lint_required": false,
+    "tests_required": false,
+    "coverage_min": 0,
+    "build_required": false,
+    "description": "Prototype or experimental code"
+  },
+  "link_check": {
+    "resample_failures": 3,
+    "timeout_ms": 5000,
+    "treat_3xx_as_pass": true,
+    "concurrent_checks": 5,
+    "rate_limit_ms": 100,
+    "description": "Link validation profile"
+  },
+  "link_strict": {
+    "resample_failures": 5,
+    "timeout_ms": 10000,
+    "treat_3xx_as_pass": false,
+    "concurrent_checks": 3,
+    "rate_limit_ms": 200,
+    "require_full_coverage": true,
+    "description": "Strict link validation with no failures allowed"
+  },
+  "api_basic": {
+    "timeout_ms": 10000,
+    "validate_schema": false,
+    "check_response_time": true,
+    "max_response_time_ms": 2000,
+    "description": "Basic API endpoint checking"
+  },
+  "api_strict": {
+    "timeout_ms": 15000,
+    "validate_schema": true,
+    "check_response_time": true,
+    "max_response_time_ms": 1000,
+    "require_all_endpoints": true,
+    "description": "Strict API validation with schema checks"
+  },
+  "quick_task": {
+    "word_min": 100,
+    "strict": false,
+    "description": "Lenient profile for quick tasks"
+  }
+}

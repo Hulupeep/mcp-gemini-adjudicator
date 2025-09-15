@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjudicator Dashboard - Phase 1</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            color: #aaa;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+
+        .verification-table {
+            background: #0f0f1e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1a1a2e;
+            color: #667eea;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #2a2a3e;
+        }
+
+        tr:hover {
+            background: #1a1a2e;
+        }
+
+        .commitment-col, .claim-col, .verified-col {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .commitment-col {
+            color: #4fc3f7;
+        }
+
+        .claim-col {
+            color: #ffd54f;
+        }
+
+        .verified-col {
+            color: #81c784;
+        }
+
+        .status-pass {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .status-fail {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .status-partial {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #9e9e9e;
+            font-style: italic;
+        }
+
+        .json-preview {
+            background: #0a0a0f;
+            padding: 8px;
+            border-radius: 4px;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .expand-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .expand-btn:hover {
+            background: #764ba2;
+        }
+
+        .details-row {
+            display: none;
+            background: #0a0a0f;
+        }
+
+        .details-row.expanded {
+            display: table-row;
+        }
+
+        .details-content {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .json-block {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            background: #2a2a3e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 0.85em;
+        }
+
+        .unit-result {
+            display: inline-block;
+            margin: 2px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+
+        .unit-ok {
+            background: #1b5e20;
+            color: #4caf50;
+        }
+
+        .unit-fail {
+            background: #b71c1c;
+            color: #f44336;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Adjudicator Dashboard - Phase 1 <span class="live-indicator"></span></h1>
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-tasks">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pass-rate">0%</div>
+                    <div class="stat-label">Pass Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="claims-received">0</div>
+                    <div class="stat-label">Claims Received</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-completion">0%</div>
+                    <div class="stat-label">Avg Completion</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="verification-table">
+            <h2>Verification History</h2>
+            <table id="verification-list">
+                <thead>
+                    <tr>
+                        <th>Task ID</th>
+                        <th>Type</th>
+                        <th>Commitment</th>
+                        <th>Claim</th>
+                        <th>Verified</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="task-rows">
+                    <!-- Rows will be added dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const tasks = new Map();
+
+        // Connect to server
+        socket.on('connect', () => {
+            console.log('Connected to monitoring server');
+            loadTasks();
+        });
+
+        // Load existing tasks
+        async function loadTasks() {
+            try {
+                const response = await fetch('/api/tasks');
+                const data = await response.json();
+
+                data.tasks.forEach(task => {
+                    tasks.set(task.task_id, task);
+                });
+
+                updateDisplay();
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        // Handle new commitment
+        socket.on('commitment', (commitment) => {
+            const task = tasks.get(commitment.task_id) || {};
+            task.commitment = commitment;
+            task.task_id = commitment.task_id;
+            task.type = commitment.type;
+            tasks.set(commitment.task_id, task);
+            updateDisplay();
+        });
+
+        // Handle new claim
+        socket.on('claim', (claim) => {
+            const task = tasks.get(claim.task_id) || {};
+            task.claim = claim;
+            tasks.set(claim.task_id, task);
+            updateDisplay();
+        });
+
+        // Handle verdict
+        socket.on('verdict', (verdict) => {
+            const task = tasks.get(verdict.task_id) || {};
+            task.verdict = verdict;
+            tasks.set(verdict.task_id, task);
+            updateDisplay();
+        });
+
+        // Update display
+        function updateDisplay() {
+            updateStats();
+            updateTable();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalTasks = tasks.size;
+            let passCount = 0;
+            let claimCount = 0;
+            let totalCompletion = 0;
+            let completionCount = 0;
+
+            tasks.forEach(task => {
+                if (task.claim) claimCount++;
+                if (task.verdict) {
+                    if (task.verdict.status === 'pass') passCount++;
+                    if (task.verdict.units_expected > 0) {
+                        totalCompletion += task.verdict.units_verified / task.verdict.units_expected;
+                        completionCount++;
+                    }
+                }
+            });
+
+            document.getElementById('total-tasks').textContent = totalTasks;
+            document.getElementById('claims-received').textContent = claimCount;
+            document.getElementById('pass-rate').textContent = totalTasks > 0
+                ? Math.round((passCount / totalTasks) * 100) + '%'
+                : '0%';
+            document.getElementById('avg-completion').textContent = completionCount > 0
+                ? Math.round((totalCompletion / completionCount) * 100) + '%'
+                : '0%';
+        }
+
+        // Update table
+        function updateTable() {
+            const tbody = document.getElementById('task-rows');
+            tbody.innerHTML = '';
+
+            // Sort tasks by timestamp (newest first)
+            const sortedTasks = Array.from(tasks.values()).sort((a, b) => {
+                const timeA = a.commitment?.timestamp || '';
+                const timeB = b.commitment?.timestamp || '';
+                return timeB.localeCompare(timeA);
+            });
+
+            sortedTasks.forEach(task => {
+                const row = createTaskRow(task);
+                tbody.appendChild(row);
+
+                const detailsRow = createDetailsRow(task);
+                tbody.appendChild(detailsRow);
+            });
+        }
+
+        // Create task row
+        function createTaskRow(task) {
+            const row = document.createElement('tr');
+
+            // Task ID
+            const idCell = document.createElement('td');
+            idCell.textContent = task.task_id?.substring(5, 15) || 'Unknown';
+            row.appendChild(idCell);
+
+            // Type
+            const typeCell = document.createElement('td');
+            typeCell.textContent = task.type || 'unknown';
+            row.appendChild(typeCell);
+
+            // Commitment
+            const commitmentCell = document.createElement('td');
+            commitmentCell.className = 'commitment-col';
+            if (task.commitment) {
+                const expected = task.commitment.commitments?.expected_total || 0;
+                const wordMin = task.commitment.commitments?.quality?.word_min || 0;
+                commitmentCell.innerHTML = `<div class="json-preview">Total: ${expected}, Words: ${wordMin}</div>`;
+            } else {
+                commitmentCell.innerHTML = '<span class="status-pending">Pending</span>';
+            }
+            row.appendChild(commitmentCell);
+
+            // Claim
+            const claimCell = document.createElement('td');
+            claimCell.className = 'claim-col';
+            if (task.claim) {
+                const claimed = task.claim.claimed?.units_total || 0;
+                const type = task.claim.claimed?.type || 'unknown';
+                claimCell.innerHTML = `<div class="json-preview">Claimed: ${claimed} (${type})</div>`;
+            } else {
+                claimCell.innerHTML = '<span class="status-pending">No claim</span>';
+            }
+            row.appendChild(claimCell);
+
+            // Verified
+            const verifiedCell = document.createElement('td');
+            verifiedCell.className = 'verified-col';
+            if (task.verdict) {
+                const verified = task.verdict.units_verified || 0;
+                const expected = task.verdict.units_expected || 0;
+                verifiedCell.innerHTML = `<div class="json-preview">${verified}/${expected} units</div>`;
+            } else {
+                verifiedCell.innerHTML = '<span class="status-pending">Not verified</span>';
+            }
+            row.appendChild(verifiedCell);
+
+            // Status
+            const statusCell = document.createElement('td');
+            if (task.verdict) {
+                const statusClass = `status-${task.verdict.status}`;
+                statusCell.innerHTML = `<span class="${statusClass}">${task.verdict.status.toUpperCase()}</span>`;
+            } else {
+                statusCell.innerHTML = '<span class="status-pending">Pending</span>';
+            }
+            row.appendChild(statusCell);
+
+            // Actions
+            const actionsCell = document.createElement('td');
+            const expandBtn = document.createElement('button');
+            expandBtn.className = 'expand-btn';
+            expandBtn.textContent = 'Details';
+            expandBtn.onclick = () => toggleDetails(task.task_id);
+            actionsCell.appendChild(expandBtn);
+            row.appendChild(actionsCell);
+
+            return row;
+        }
+
+        // Create details row
+        function createDetailsRow(task) {
+            const row = document.createElement('tr');
+            row.className = 'details-row';
+            row.id = `details-${task.task_id}`;
+
+            const cell = document.createElement('td');
+            cell.colSpan = 7;
+            cell.className = 'details-content';
+
+            let html = '<div>';
+
+            // Commitment details
+            if (task.commitment) {
+                html += '<div class="section-title">📋 Commitment</div>';
+                html += '<div class="json-block">' + JSON.stringify(task.commitment, null, 2) + '</div>';
+            }
+
+            // Claim details
+            if (task.claim) {
+                html += '<div class="section-title">📝 Claim</div>';
+                html += '<div class="json-block">' + JSON.stringify(task.claim, null, 2) + '</div>';
+            }
+
+            // Verdict details
+            if (task.verdict) {
+                html += '<div class="section-title">✅ Verdict</div>';
+                html += '<div class="json-block">' + JSON.stringify(task.verdict, null, 2) + '</div>';
+
+                // Per-unit results
+                if (task.verdict.per_unit && task.verdict.per_unit.length > 0) {
+                    html += '<div class="section-title">Per-Unit Results:</div>';
+                    html += '<div>';
+                    task.verdict.per_unit.forEach(unit => {
+                        const className = unit.ok ? 'unit-ok' : 'unit-fail';
+                        const icon = unit.ok ? '✓' : '✗';
+                        html += `<span class="unit-result ${className}">${icon} ${unit.id}</span>`;
+                    });
+                    html += '</div>';
+                }
+
+                // Metrics
+                if (task.verdict.metrics) {
+                    html += '<div class="section-title">Metrics:</div>';
+                    html += '<div>';
+                    Object.entries(task.verdict.metrics).forEach(([key, value]) => {
+                        html += `<span class="metric-badge">${key}: ${value}</span>`;
+                    });
+                    html += '</div>';
+                }
+            }
+
+            html += '</div>';
+            cell.innerHTML = html;
+            row.appendChild(cell);
+
+            return row;
+        }
+
+        // Toggle details row
+        function toggleDetails(taskId) {
+            const detailsRow = document.getElementById(`details-${taskId}`);
+            if (detailsRow) {
+                detailsRow.classList.toggle('expanded');
+            }
+        }
+
+        // Auto-refresh
+        setInterval(() => {
+            loadTasks();
+        }, 5000);
+    </script>
+</body>
+</html>

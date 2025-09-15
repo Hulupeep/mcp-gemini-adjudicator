@@ -1,0 +1,144 @@
+#!/usr/bin/env node
+/**
+ * API Adapter CLI Dispatcher
+ */
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { promises as fs } from 'fs';
+import { checkApis } from '../src/check.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+async function main() {
+    const args = process.argv.slice(2);
+
+    if (args.length === 0) {
+        showHelp();
+        process.exit(0);
+    }
+
+    const command = args[0];
+    const options = parseArguments(args.slice(1));
+
+    // Ensure task directory exists
+    if (options.taskDir) {
+        await fs.mkdir(options.taskDir, { recursive: true });
+    }
+
+    // Load files if provided
+    if (options.commitmentPath) {
+        try {
+            options.commitment = JSON.parse(await fs.readFile(options.commitmentPath, 'utf8'));
+        } catch (error) {
+            console.error(`Error loading commitment: ${error.message}`);
+        }
+    }
+
+    if (options.claimPath) {
+        try {
+            options.claim = JSON.parse(await fs.readFile(options.claimPath, 'utf8'));
+        } catch (error) {
+            console.error(`Error loading claim: ${error.message}`);
+        }
+    }
+
+    if (options.profilePath) {
+        try {
+            options.profile = JSON.parse(await fs.readFile(options.profilePath, 'utf8'));
+        } catch (error) {
+            console.error(`Error loading profile: ${error.message}`);
+        }
+    }
+
+    // Execute command
+    try {
+        switch (command) {
+            case 'api:check':
+                await checkApis(options);
+                console.log(`✓ API check complete: ${options.taskDir}/api/check.json`);
+                break;
+
+            default:
+                console.error(`Unknown command: ${command}`);
+                showHelp();
+                process.exit(1);
+        }
+    } catch (error) {
+        console.error(`Error executing ${command}:`, error.message);
+        process.exit(1);
+    }
+}
+
+function parseArguments(args) {
+    const options = {
+        taskDir: '.artifacts/current',
+        commitmentPath: null,
+        claimPath: null,
+        profilePath: null,
+        commitment: {},
+        claim: {},
+        profile: {}
+    };
+
+    for (let i = 0; i < args.length; i++) {
+        switch (args[i]) {
+            case '--task-dir':
+                if (args[i + 1]) {
+                    options.taskDir = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--commitment':
+                if (args[i + 1]) {
+                    options.commitmentPath = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--claim':
+                if (args[i + 1]) {
+                    options.claimPath = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--profile':
+                if (args[i + 1]) {
+                    options.profilePath = args[i + 1];
+                    i++;
+                }
+                break;
+        }
+    }
+
+    return options;
+}
+
+function showHelp() {
+    console.log(`
+API Adapter CLI - API endpoint verification
+
+Usage: adapter-api <command> [options]
+
+Commands:
+  api:check    Check API endpoints and validate schemas
+
+Options:
+  --task-dir <path>      Directory for artifacts
+  --commitment <file>    Path to commitment.json
+  --claim <file>         Path to claim.json
+  --profile <file>       Path to profiles file
+
+Example:
+  adapter-api api:check --task-dir .artifacts/T_api_1
+`);
+}
+
+// Run main function
+main().catch(error => {
+    console.error('Fatal error:', error);
+    process.exit(1);
+});

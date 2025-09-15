@@ -1,0 +1,7 @@
+{
+  "task_id": "T_complete",
+  "artifacts": [
+    {"type": "code:diff", "files": ["test.js"], "changes": 10},
+    {"type": "code:lint", "errors": 0, "warnings": 0}
+  ]
+}

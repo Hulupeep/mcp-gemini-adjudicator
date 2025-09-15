@@ -1,0 +1,24 @@
+{
+  "total_checked": 8,
+  "passed": 3,
+  "failed": 5,
+  "statuses": {
+    "https://www.google.com": 200,
+    "https://httpstat.us/200": "error",
+    "https://httpstat.us/404": "error",
+    "https://httpstat.us/500": "error",
+    "https://httpstat.us/301": "error",
+    "https://invalid-domain-that-does-not-exist-12345.com": "error",
+    "https://github.com": 200,
+    "https://example.com": 200
+  },
+  "summary": {
+    "2xx": 3,
+    "3xx": 0,
+    "4xx": 0,
+    "5xx": 0,
+    "timeout": 0,
+    "error": 5
+  },
+  "timestamp": "2025-09-15T14:09:08.751Z"
+}

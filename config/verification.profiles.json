@@ -1,0 +1,11 @@
+{
+  "content_default": {
+    "required_artifacts": ["content:scan"],
+    "word_min": 100
+  },
+  "code_default": {
+    "required_artifacts": ["code:diff", "code:lint"],
+    "lint_clean": true,
+    "tests_pass": false
+  }
+}

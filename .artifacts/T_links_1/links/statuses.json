@@ -1,0 +1,10 @@
+{
+  "https://httpstat.us/200": "error",
+  "https://httpstat.us/404": "error",
+  "https://httpstat.us/500": "error",
+  "https://httpstat.us/301": "error",
+  "https://invalid-domain-that-does-not-exist-12345.com": "error",
+  "https://www.google.com": 200,
+  "https://github.com": 200,
+  "https://example.com": 200
+}

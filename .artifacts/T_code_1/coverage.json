@@ -1,0 +1,26 @@
+{
+  "pct": 0,
+  "lines": {
+    "pct": 0,
+    "covered": 0,
+    "total": 0
+  },
+  "branches": {
+    "pct": 0,
+    "covered": 0,
+    "total": 0
+  },
+  "functions": {
+    "pct": 0,
+    "covered": 0,
+    "total": 0
+  },
+  "statements": {
+    "pct": 0,
+    "covered": 0,
+    "total": 0
+  },
+  "report_path": "",
+  "framework": "nyc",
+  "raw_output": "\n> mcp-gemini-adjudicator@0.1.0 test\n> node test-server.mjs\n\n✅ MCP Gemini Adjudicator Server Test\n=====================================\n\n📋 Server Configuration:\n- Name: mcp-gemini-adjudicator\n- Version: 0.1.0\n- Transport: stdio\n\n🛠️ Available Tools:\n1. verify_with_gemini\n   - Evaluates artifacts (code, answers, specs)\n   - Returns structured JSON verdict\n   - Optional Google Search grounding\n\n2. consensus_check\n   - Compares multiple model answers\n   - Identifies agreements and conflicts\n   - Optional triangulation with Gemini's answer\n\n📝 Example Usage in Claude Desktop:\n```json\n{\n  \"mcpServers\": {\n    \"gemini-adjudicator\": {\n      \"command\": \"node\",\n      \"args\": [\n        \"/home/xanacan/Dropbox/code/mcp-gemini-adjudicator/index.mjs\"\n      ],\n      \"env\": {\n        \"GEMINI_API_KEY\": \"YOUR_GOOGLE_AI_STUDIO_KEY\",\n        \"GEMINI_MODEL\": \"gemini-2.0-flash-exp\"\n      }\n    }\n  }\n}\n```\n\n✅ Server is ready for integration!\n⚠️  Remember to set your GEMINI_API_KEY before using with real requests.\n🔑 Get your API key from: https://aistudio.google.com/app/apikey\n"
+}

@@ -1,0 +1,133 @@
+{
+  "total_resampled": 5,
+  "recovered": 0,
+  "still_failed": 5,
+  "resample_attempts": [
+    {
+      "url": "https://httpstat.us/200",
+      "original_status": "error",
+      "final_status": "error",
+      "recovered": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:17.275Z"
+        },
+        {
+          "attempt": 2,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:20.218Z"
+        },
+        {
+          "attempt": 3,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:25.265Z"
+        }
+      ]
+    },
+    {
+      "url": "https://httpstat.us/404",
+      "original_status": "error",
+      "final_status": "error",
+      "recovered": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:27.303Z"
+        },
+        {
+          "attempt": 2,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:30.127Z"
+        },
+        {
+          "attempt": 3,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:34.923Z"
+        }
+      ]
+    },
+    {
+      "url": "https://httpstat.us/500",
+      "original_status": "error",
+      "final_status": "error",
+      "recovered": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:36.730Z"
+        },
+        {
+          "attempt": 2,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:39.575Z"
+        },
+        {
+          "attempt": 3,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:44.373Z"
+        }
+      ]
+    },
+    {
+      "url": "https://httpstat.us/301",
+      "original_status": "error",
+      "final_status": "error",
+      "recovered": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:46.144Z"
+        },
+        {
+          "attempt": 2,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:48.932Z"
+        },
+        {
+          "attempt": 3,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:53.707Z"
+        }
+      ]
+    },
+    {
+      "url": "https://invalid-domain-that-does-not-exist-12345.com",
+      "original_status": "error",
+      "final_status": "error",
+      "recovered": false,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:54.783Z"
+        },
+        {
+          "attempt": 2,
+          "status": "error",
+          "timestamp": "2025-09-15T14:09:56.868Z"
+        },
+        {
+          "attempt": 3,
+          "status": "error",
+          "timestamp": "2025-09-15T14:10:00.950Z"
+        }
+      ]
+    }
+  ],
+  "final_statuses": {
+    "https://httpstat.us/200": "error",
+    "https://httpstat.us/404": "error",
+    "https://httpstat.us/500": "error",
+    "https://httpstat.us/301": "error",
+    "https://invalid-domain-that-does-not-exist-12345.com": "error",
+    "https://www.google.com": 200,
+    "https://github.com": 200,
+    "https://example.com": 200
+  },
+  "timestamp": "2025-09-15T14:09:15.082Z"
+}

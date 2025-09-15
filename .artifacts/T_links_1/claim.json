@@ -1,0 +1,10 @@
+{
+  "task_id": "T_links_1",
+  "claimed": {
+    "type": "link_check",
+    "units_total": 8,
+    "source_url": "test-page.html",
+    "files_modified": ["test-page.html"],
+    "notes": "Checking all links on the page"
+  }
+}

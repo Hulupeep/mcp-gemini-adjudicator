@@ -1,0 +1,11 @@
+{
+  "task_id": "T_fail",
+  "type": "content",
+  "profile": "content_default",
+  "commitments": {
+    "expected_total": 3,
+    "quality": {
+      "word_min": 400
+    }
+  }
+}

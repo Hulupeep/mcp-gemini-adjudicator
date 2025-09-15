@@ -1,0 +1,12 @@
+{
+  "task_id": "T_links_1",
+  "type": "link_check",
+  "profile": "link_check",
+  "user_instruction": "Check all links on the page",
+  "commitments": {
+    "expected_total": 8,
+    "scope": {
+      "target_url": "test-page.html"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "T_code_1",
+  "claimed": {
+    "type": "code",
+    "units_total": 3,
+    "units_list": ["getData", "processData", "saveData"],
+    "files_modified": ["src/test-example.js"],
+    "functions_touched": ["getData", "processData", "saveData"],
+    "lint_fixed": true,
+    "tests_updated": false,
+    "notes": "Added console.log statements to 3 functions and fixed lint errors"
+  }
+}

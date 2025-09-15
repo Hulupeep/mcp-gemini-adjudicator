@@ -1,0 +1,7 @@
+{
+  "task_id": "T_validation",
+  "type": "content",
+  "commitments": {
+    "expected_total": 2
+  }
+}

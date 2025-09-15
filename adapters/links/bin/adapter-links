@@ -1,0 +1,207 @@
+#!/usr/bin/env node
+/**
+ * Links Adapter CLI Dispatcher
+ * Routes commands to appropriate link verification modules
+ */
+
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { promises as fs } from 'fs';
+
+// Import adapters
+import { discoverLinks } from '../src/discover.mjs';
+import { checkLinks } from '../src/check.mjs';
+import { resampleLinks } from '../src/resample.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+async function main() {
+    const args = process.argv.slice(2);
+
+    if (args.length === 0) {
+        showHelp();
+        process.exit(0);
+    }
+
+    const command = args[0];
+    const options = parseArguments(args.slice(1));
+
+    // Ensure task directory exists
+    if (options.taskDir) {
+        await fs.mkdir(options.taskDir, { recursive: true });
+    }
+
+    // Load commitment and claim if provided
+    if (options.commitmentPath) {
+        try {
+            options.commitment = JSON.parse(await fs.readFile(options.commitmentPath, 'utf8'));
+        } catch (error) {
+            console.error(`Error loading commitment: ${error.message}`);
+        }
+    }
+
+    if (options.claimPath) {
+        try {
+            options.claim = JSON.parse(await fs.readFile(options.claimPath, 'utf8'));
+        } catch (error) {
+            console.error(`Error loading claim: ${error.message}`);
+        }
+    }
+
+    if (options.profilePath) {
+        try {
+            options.profile = JSON.parse(await fs.readFile(options.profilePath, 'utf8'));
+        } catch (error) {
+            console.error(`Error loading profile: ${error.message}`);
+        }
+    }
+
+    // Execute command
+    try {
+        switch (command) {
+            case 'links:discover':
+                await discoverLinks(options);
+                console.log(`✓ Link discovery complete: ${options.taskDir}/links/urlset.json`);
+                break;
+
+            case 'links:check':
+                await checkLinks(options);
+                console.log(`✓ Link checking complete: ${options.taskDir}/links/statuses.json`);
+                break;
+
+            case 'links:resample':
+                await resampleLinks(options);
+                console.log(`✓ Link resampling complete: ${options.taskDir}/links/resample.json`);
+                break;
+
+            case 'links:all':
+                // Run full link verification pipeline
+                console.log('Running full link verification pipeline...');
+
+                const discovered = await discoverLinks(options);
+                console.log(`  ✓ Discovered ${discovered.discovered_count} links`);
+
+                const checked = await checkLinks(options);
+                console.log(`  ✓ Checked ${checked.total_checked} links: ${checked.passed} passed, ${checked.failed} failed`);
+
+                if (checked.failed > 0) {
+                    const resampled = await resampleLinks(options);
+                    console.log(`  ✓ Resampled ${resampled.total_resampled} failed links: ${resampled.recovered} recovered`);
+                }
+
+                console.log(`\n✓ Link verification complete in ${options.taskDir}/links/`);
+                break;
+
+            default:
+                console.error(`Unknown command: ${command}`);
+                showHelp();
+                process.exit(1);
+        }
+    } catch (error) {
+        console.error(`Error executing ${command}:`, error.message);
+        process.exit(1);
+    }
+}
+
+function parseArguments(args) {
+    const options = {
+        taskDir: '.artifacts/current',
+        commitmentPath: null,
+        claimPath: null,
+        profilePath: null,
+        commitment: {},
+        claim: {},
+        profile: {},
+        url: null
+    };
+
+    for (let i = 0; i < args.length; i++) {
+        switch (args[i]) {
+            case '--task-dir':
+                if (args[i + 1]) {
+                    options.taskDir = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--commitment':
+                if (args[i + 1]) {
+                    options.commitmentPath = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--claim':
+                if (args[i + 1]) {
+                    options.claimPath = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--profile':
+                if (args[i + 1]) {
+                    options.profilePath = args[i + 1];
+                    i++;
+                }
+                break;
+
+            case '--url':
+                if (args[i + 1]) {
+                    options.url = args[i + 1];
+                    i++;
+                }
+                break;
+        }
+    }
+
+    return options;
+}
+
+function showHelp() {
+    console.log(`
+Links Adapter CLI - Link verification for MCP Gemini Adjudicator
+
+Usage: adapter-links <command> [options]
+
+Commands:
+  links:discover    Discover links from URL or sitemap
+  links:check       Check HTTP status of discovered links
+  links:resample    Retry failed links with backoff
+  links:all         Run full verification pipeline
+
+Options:
+  --task-dir <path>      Directory for artifacts (default: .artifacts/current)
+  --commitment <file>    Path to commitment.json file
+  --claim <file>         Path to claim.json file
+  --profile <file>       Path to verification profiles file
+  --url <url>            Source URL for discovery (page or sitemap)
+
+Examples:
+  adapter-links links:discover --task-dir .artifacts/T_links_1 --url https://example.com
+  adapter-links links:check --task-dir .artifacts/T_links_1 --profile config/profiles.json
+  adapter-links links:resample --task-dir .artifacts/T_links_1
+  adapter-links links:all --task-dir .artifacts/T_links_1 --url https://example.com/sitemap.xml
+
+Output:
+  Each command creates JSON files in the task directory:
+  - links/urlset.json      List of discovered URLs
+  - links/statuses.json    HTTP status for each URL
+  - links/resample.json    Retry results for failed URLs
+  - links/discovery.json   Discovery metadata
+  - links/check.json       Check summary
+
+Profile Settings:
+  - resample_failures: Number of retry attempts (default: 3)
+  - timeout_ms: Request timeout in milliseconds (default: 5000)
+  - treat_3xx_as_pass: Consider redirects as success (default: true)
+  - concurrent_checks: Parallel check limit (default: 5)
+  - rate_limit_ms: Delay between batches (default: 100)
+`);
+}
+
+// Run main function
+main().catch(error => {
+    console.error('Fatal error:', error);
+    process.exit(1);
+});

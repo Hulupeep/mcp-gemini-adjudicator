@@ -1,0 +1,8 @@
+{
+  "task_id": "T_fail",
+  "claim": {
+    "type": "content",
+    "units_total": 1,
+    "units_list": ["test.md"]
+  }
+}

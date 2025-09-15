@@ -1,0 +1,10 @@
+[
+  "https://www.google.com",
+  "https://httpstat.us/200",
+  "https://httpstat.us/404",
+  "https://httpstat.us/500",
+  "https://httpstat.us/301",
+  "https://invalid-domain-that-does-not-exist-12345.com",
+  "https://github.com",
+  "https://example.com"
+]

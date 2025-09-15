@@ -1,0 +1,12 @@
+{
+  "task_id": "T_api_1",
+  "claimed": {
+    "type": "api_check",
+    "units_total": 3,
+    "endpoints": [
+      {"url": "https://httpstat.us/200", "method": "GET"},
+      {"url": "https://httpstat.us/201", "method": "GET"},
+      {"url": "https://httpstat.us/404", "method": "GET"}
+    ]
+  }
+}

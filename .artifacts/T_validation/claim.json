@@ -1,0 +1,16 @@
+{
+  "schema": "verify.claim/v1.1",
+  "actor": "claude",
+  "task_id": "T_validation",
+  "timestamp": "2024-12-18T10:30:00Z",
+  "claim": {
+    "type": "content",
+    "units_total": 2,
+    "units_list": ["file1.md", "file2.md"],
+    "word_count": 800,
+    "lint_clean": true,
+    "scope": {
+      "repo_root": "/test"
+    }
+  }
+}

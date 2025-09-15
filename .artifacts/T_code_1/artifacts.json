@@ -1,0 +1,166 @@
+{
+  "task_dir": ".artifacts/T_code_1",
+  "timestamp": "2025-09-15T13:59:43.199Z",
+  "files": [
+    {
+      "path": "artifacts.json",
+      "size": 0,
+      "modified": "2025-09-15T13:59:43.170Z",
+      "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "claim.json",
+      "size": 393,
+      "modified": "2025-09-15T13:59:42.395Z",
+      "checksum": "7021827d5c81c18540e899151f35ed8befbaef2111127b4f72e06d681a420e61"
+    },
+    {
+      "path": "commitment.json",
+      "size": 492,
+      "modified": "2025-09-15T13:59:42.393Z",
+      "checksum": "5db251b62b66ead52b910d1c49fc4287fb595eecf8b13acaff20f279bf7b5b2f"
+    },
+    {
+      "path": "coverage.json",
+      "size": 1504,
+      "modified": "2025-09-15T13:59:43.162Z",
+      "checksum": "f8a94a571888c2887a0e09910802edf309872edc06c42d3eed1ecec231fd5516"
+    },
+    {
+      "path": "diff.json",
+      "size": 934,
+      "modified": "2025-09-15T13:59:42.442Z",
+      "checksum": "094fb6cb55ffba3b660da1a79153dcc485cb705631d8222b67ab65eb949d7f9d"
+    },
+    {
+      "path": "diff_names.json",
+      "size": 725,
+      "modified": "2025-09-15T13:59:42.441Z",
+      "checksum": "0373cf71d6dc7e4940279ece30f2ac5f50b1403f4e87e03c9a700f355af889b2"
+    },
+    {
+      "path": "diffs.patch",
+      "size": 22128,
+      "modified": "2025-09-15T13:59:42.442Z",
+      "checksum": "7362e29285c561eb331e5db4d2992a6bd394cf63e191cde21d885aab1d9c422e"
+    },
+    {
+      "path": "lint.json",
+      "size": 143,
+      "modified": "2025-09-15T13:59:42.673Z",
+      "checksum": "0ec4a398e31d83ec1da3838a7cc74f8fb4a20b2df5933d6d8677eaa4b7fab7e0"
+    },
+    {
+      "path": "tests.json",
+      "size": 186,
+      "modified": "2025-09-15T13:59:42.719Z",
+      "checksum": "5f025df4dec4d440a2cb0fe859f7735388c00d3db5f4ffe5d20df6a10dc1de56"
+    }
+  ],
+  "checksums": {
+    "artifacts.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "claim.json": "7021827d5c81c18540e899151f35ed8befbaef2111127b4f72e06d681a420e61",
+    "commitment.json": "5db251b62b66ead52b910d1c49fc4287fb595eecf8b13acaff20f279bf7b5b2f",
+    "coverage.json": "f8a94a571888c2887a0e09910802edf309872edc06c42d3eed1ecec231fd5516",
+    "diff.json": "094fb6cb55ffba3b660da1a79153dcc485cb705631d8222b67ab65eb949d7f9d",
+    "diff_names.json": "0373cf71d6dc7e4940279ece30f2ac5f50b1403f4e87e03c9a700f355af889b2",
+    "diffs.patch": "7362e29285c561eb331e5db4d2992a6bd394cf63e191cde21d885aab1d9c422e",
+    "lint.json": "0ec4a398e31d83ec1da3838a7cc74f8fb4a20b2df5933d6d8677eaa4b7fab7e0",
+    "tests.json": "5f025df4dec4d440a2cb0fe859f7735388c00d3db5f4ffe5d20df6a10dc1de56"
+  },
+  "summary": {
+    "diff": {
+      "files_modified": [
+        ".claude/settings.json",
+        "package-lock.json",
+        "package.json"
+      ],
+      "files_created": [
+        ".artifacts/",
+        ".claude/hooks/claude-wrapper.md",
+        ".claude/hooks/post-task-claim.sh",
+        ".claude/hooks/post-task-verification-enhanced.sh",
+        ".claude/hooks/pre-task-commitment.sh",
+        ".claude/hooks/storage-interface.sh",
+        ".claude/verification/",
+        "PHASE1_IMPLEMENTATION.md",
+        "SETUP_GUIDE.md",
+        "adapters/",
+        "claude-config.json",
+        "monitoring/public/phase1-dashboard.html",
+        "prd2.md",
+        "src/adapters/",
+        "src/migrate-to-sqlite.mjs",
+        "src/storage-sqlite.mjs",
+        "src/storage.mjs",
+        "src/test-example.js",
+        "start-mcp.sh",
+        "test-phase1.sh",
+        "test-phase2.sh",
+        "testblog/",
+        "tests/",
+        "tools/",
+        "verification.profiles.json"
+      ],
+      "files_deleted": [],
+      "functions_modified": [],
+      "endpoints_modified": [],
+      "total_changes": 28
+    },
+    "lint": {
+      "exitCode": 2,
+      "summary": "Checked 0 files: 0 errors, 0 warnings",
+      "errors": 0,
+      "warnings": 0,
+      "files_checked": 0,
+      "issues": []
+    },
+    "tests": {
+      "passed": 0,
+      "failed": 0,
+      "total": 0,
+      "skipped": 0,
+      "duration": 12,
+      "test_command": "",
+      "test_framework": "",
+      "details": [],
+      "summary": "No test framework detected"
+    },
+    "coverage": {
+      "pct": 0,
+      "lines": {
+        "pct": 0,
+        "covered": 0,
+        "total": 0
+      },
+      "branches": {
+        "pct": 0,
+        "covered": 0,
+        "total": 0
+      },
+      "functions": {
+        "pct": 0,
+        "covered": 0,
+        "total": 0
+      },
+      "statements": {
+        "pct": 0,
+        "covered": 0,
+        "total": 0
+      },
+      "report_path": "",
+      "framework": "nyc",
+      "raw_output": "\n> mcp-gemini-adjudicator@0.1.0 test\n> node test-server.mjs\n\n✅ MCP Gemini Adjudicator Server Test\n=====================================\n\n📋 Server Configuration:\n- Name: mcp-gemini-adjudicator\n- Version: 0.1.0\n- Transport: stdio\n\n🛠️ Available Tools:\n1. verify_with_gemini\n   - Evaluates artifacts (code, answers, specs)\n   - Returns structured JSON verdict\n   - Optional Google Search grounding\n\n2. consensus_check\n   - Compares multiple model answers\n   - Identifies agreements and conflicts\n   - Optional triangulation with Gemini's answer\n\n📝 Example Usage in Claude Desktop:\n```json\n{\n  \"mcpServers\": {\n    \"gemini-adjudicator\": {\n      \"command\": \"node\",\n      \"args\": [\n        \"/home/xanacan/Dropbox/code/mcp-gemini-adjudicator/index.mjs\"\n      ],\n      \"env\": {\n        \"GEMINI_API_KEY\": \"YOUR_GOOGLE_AI_STUDIO_KEY\",\n        \"GEMINI_MODEL\": \"gemini-2.0-flash-exp\"\n      }\n    }\n  }\n}\n```\n\n✅ Server is ready for integration!\n⚠️  Remember to set your GEMINI_API_KEY before using with real requests.\n🔑 Get your API key from: https://aistudio.google.com/app/apikey\n"
+    }
+  },
+  "metrics": {
+    "total_files": 9,
+    "has_diff": true,
+    "has_lint": true,
+    "has_tests": true,
+    "has_coverage": true,
+    "lint_passed": false,
+    "tests_passed": false,
+    "coverage_pct": 0
+  }
+}

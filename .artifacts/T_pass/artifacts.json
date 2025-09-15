@@ -1,0 +1,6 @@
+{
+  "task_id": "T_pass",
+  "artifacts": [
+    {"type": "content:scan", "files": [{"name": "test.md", "word_count": 500}]}
+  ]
+}
